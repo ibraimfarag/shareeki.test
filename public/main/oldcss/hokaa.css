@@ -1,0 +1,110 @@
+.ads-cards .card .card-body .ad-details p span{
+    
+    color: #007bff;
+}
+
+///
+.ads-img {
+    text-align: right;
+    width: 102%;
+    font-family: dubai;
+    height: 100px;
+}
+
+.ads-img img {
+    border-radius: 10px;
+    width: 100%;
+}
+
+
+/////
+
+
+//////
+
+    .nav-bar .container .row div:nth-of-type(1){ }
+
+@media screen and (max-width: 767px){
+    
+    .nav-bar .container .row div:nth-of-type(1){
+        
+    position: relative;
+        width: 300px;
+    height: 127px;
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    .nav-bar img {
+    vertical-align: middle;
+    border-style: none;
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+    margin: 0px;
+        height: 100%;
+        
+    }
+    .nav-bar .container .row div:nth-of-type(2){
+        margin-top: 10px !important;
+    margin-left: 0px;
+        margin-right: 0px !important;}
+    
+    .nav-bar .container .row{
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    .row{
+    margin-left: auto;
+    margin-right: auto;
+}
+    
+    
+}
+
+@media screen and (max-width: 1200px) and (min-width:991px){
+    
+    .footer .row div:nth-of-type(1), .footer .row div:nth-of-type(3){
+        font-size: 19px ;
+    }
+    
+    .footer .row div:nth-of-type(2){
+        font-size: 16px !important;
+    }
+    
+
+    
+    
+}
+
+@media screen and (max-width: 990px) and (min-width: 100px){
+        
+           .footer .row div:nth-of-type(1), .footer .row div:nth-of-type(3){
+        font-size: 19px ;
+    }
+    
+    .footer .row div:nth-of-type(2){
+        font-size: 16px !important;
+    }
+    }
+    
+
+
+//////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+.show-ad-img img{}
+@media screen and (max-width: 767px){
+    
+  .show-ad-img img{
+   width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
