@@ -82,7 +82,7 @@ Route::get('/clearcache185', function () {
     $sotagelink = \Illuminate\Support\Facades\Artisan::call('storage:link');
 });
 
-Route::post('/payment', [PageController::class, 'payment'])->name('Payment');
+Route::post('/payment', [PageController::class, 'payment'])->name('payment.process');
 Route::get('/success', function (Request $request) {
     echo "تمت عمليه  الدفع بنجاح";
 });
