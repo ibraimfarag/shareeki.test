@@ -40,7 +40,9 @@ class Post extends Model
         'pinned_at',
         'featured_rank',
         'pricing_snapshot',
-        'payment_id'
+        'payment_id',
+        'is_featured',
+        'featured_until'
     ];
     protected $guarded = [];
 
@@ -52,6 +54,8 @@ class Post extends Model
         'pinned_at' => 'datetime',
         'blacklist' => 'boolean',
         'is_paid' => 'boolean',
+        'is_featured' => 'boolean',
+        'featured_until' => 'datetime',
     ];
 
     public function adType()
@@ -80,9 +84,17 @@ class Post extends Model
 
     public function scopeFeatured($q)
     {
-        return $q->whereNotNull('pinned_at')
-            ->orderByDesc('pinned_at')
-            ->orderByDesc('featured_rank');
+        return $q->where('is_featured', true)
+            ->where(function ($query) {
+                $query->whereNull('featured_until')
+                    ->orWhere('featured_until', '>', now());
+            })
+            ->latest();
+    }
+
+    public function scopeHomeFeatured($q)
+    {
+        return $q->featured()->limit(4);
     }
 
     public function getRouteKeyName()
@@ -153,6 +165,38 @@ class Post extends Model
         //return Self::whereYear('created_at' , Carbon::now()->year)->whereMonth('created_at' , $monthNumber)->whereCategoryId($category->id)->count();
         //return self::whereYear('created_at' , Carbon::now()->year)->whereMonth('created_at' , $monthNumber)->get();
         return rand(0, 50);
+    }
+
+    // التحقق من حالة الإعلان المميز
+    public function isFeaturedActive(): bool
+    {
+        if (!$this->is_featured) {
+            return false;
+        }
+
+        if ($this->featured_until && $this->featured_until->isPast()) {
+            // إذا انتهت مدة التمييز، نقوم بإلغاء التمييز تلقائياً
+            $this->update([
+                'is_featured' => false,
+                'featured_until' => null
+            ]);
+            return false;
+        }
+
+        return true;
+    }
+
+    // التحقق من إمكانية إضافة إعلان مميز جديد
+    public static function canAddNewFeatured(): bool
+    {
+        $currentFeaturedCount = self::featured()->count();
+        return $currentFeaturedCount < 4;
+    }
+
+    // الحصول على المدة القصوى للتمييز بالأيام
+    public static function getMaxFeatureDuration(): int
+    {
+        return 90; // 3 شهور
     }
 
     // this is a recommended way to declare event handlers

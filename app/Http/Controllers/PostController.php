@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Http\Requests\PostFormRequest;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Payment;
 use App\Upload\Upload;
 use Illuminate\Http\Request;
 // use App\Models\Tag;
@@ -84,11 +85,10 @@ class PostController extends Controller
 
         $paidPosts = Post::query()
             ->where('blacklist', 0)
-            ->where('is_paid', true)
-            ->where('status', 'active')
+            ->where('is_featured', true)
             ->where(function ($q) {
-                $q->whereNull('ends_at')
-                    ->orWhere('ends_at', '>=', now());
+                $q->whereNull('featured_until')
+                    ->orWhere('featured_until', '>=', now());
             })
             ->with($with)
             ->select($baseSelect)
@@ -113,8 +113,8 @@ class PostController extends Controller
 
 
 
-        // $posts = Post::where('blacklist',0)->latest()->paginate(20);
-        // $posts = Post::where('blacklist',0)->latest()->paginate(20);
+        // $posts = Post::where('blacklist',0)->latest()->paginate(20;
+        // $posts = Post::where('blacklist',0)->latest()->paginate(20;
 
 
         $viewData = [
@@ -226,6 +226,20 @@ class PostController extends Controller
             foreach ($request->the_attachment as $attachment) {
                 Attachment::create(['post_id' => $the_post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}", $postName . "_" . rand(0, 100000))]);
             }
+        }
+
+        // التحقق من الأماكن الفارغة للإعلانات المميزة
+        $featuredLimit = 4; // الحد الأقصى للإعلانات المميزة
+        $currentFeaturedCount = Post::where('is_featured', true)
+            ->where(function ($query) {
+                $query->whereNull('featured_until')
+                    ->orWhere('featured_until', '>=', now());
+            })
+            ->count();
+
+        if ($currentFeaturedCount < $featuredLimit) {
+            // عرض صفحة العرض للإعلان المميز
+            return redirect()->route('posts.featured.offer', $the_post->id);
         }
 
         return redirect()->route('the_posts.show', $the_post->id);
@@ -439,24 +453,6 @@ class PostController extends Controller
     }
 
 
-public function showPromote(Request $request, $id)
-{
-    $post = Post::findOrFail($id);
-    // dd("Method works!", $post->id, $post->title);
-
-  $adTypes = AdType::where('is_paid', true)
-                        ->orderBy('base_price')
-                        ->get();
-        
-        // تحقق أن هناك أنواع متاحة
-        if ($adTypes->isEmpty()) {
-            return back()->with('error', 'لا توجد أنواع إعلانات مميزة متاحة حالياً');
-        }
-
-        return view('admin.posts.promote', compact('post', 'adTypes'));
-}
-
-
     public function calculatePrice(Request $request, Post $post, AdPricingService $pricing)
     {
         $request->validate([
@@ -483,7 +479,7 @@ public function showPromote(Request $request, $id)
     public function checkout(Request $request, Post $post, AdPricingService $pricing, RajhiGateway $gateway)
     {
         $this->authorize('update', $post);
-        
+
         $request->validate([
             'ad_type_id' => 'required|exists:ad_types,id',
             'duration_value' => 'required|integer|min:1|max:365',
@@ -493,7 +489,7 @@ public function showPromote(Request $request, $id)
         // التأكد أن الإعلان قابل للترقية
         $isActive = $post->status === 'active' && (is_null($post->ends_at) || $post->ends_at->gte(now()));
         $canPromote = !$post->is_paid || !$isActive;
-        
+
         if (!$canPromote) {
             return back()->with('error', 'هذا الإعلان مميز ونشط بالفعل');
         }
@@ -535,9 +531,67 @@ public function showPromote(Request $request, $id)
             // في حال فشل إنشاء الدفعة، إرجاع الحالة
             $post->update(['status' => 'draft']);
             $payment->update(['status' => 'failed']);
-            
+
             return back()->with('error', 'حدث خطأ في معالجة الدفع: ' . $e->getMessage());
         }
     }
 
+    public function showFeaturedOffer($id)
+    {
+        $post = Post::findOrFail($id);
+        return view('main.posts.featured_offer', compact('post'));
+    }
+
+    public function featuredCheckout($id)
+    {
+        $post = Post::findOrFail($id);
+
+        // إنشاء دفعة جديدة للإعلان المميز
+        $payment = Payment::create([
+            'user_id' => auth()->id(),
+            'gateway' => 'rajhi',
+            'amount' => 149.50, // السعر الإجمالي شامل الضريبة
+            'currency' => 'SAR',
+            'status' => 'pending',
+            'gateway_order_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'description' => 'تمييز إعلان - ' . $post->title,
+            'payable_type' => 'App\\Models\\Post',
+            'payable_id' => $post->id,
+        ]);
+
+        // توجيه المستخدم لصفحة الدفع
+        return redirect()->route('payments.checkout', $payment->id);
+    }
+
+    public function confirmFeatured($id)
+    {
+        $post = Post::findOrFail($id);
+        $post->update([
+            'is_featured' => true,
+            'featured_until' => now()->addDays(90), // 3 أشهر = 90 يوم
+        ]);
+
+        return redirect()->route('the_posts.show', $post->id)->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
+    }
+
+    public function approveAndCheckout($id)
+    {
+        $post = Post::findOrFail($id);
+
+        // إنشاء دفعة جديدة للإعلان المميز
+        $payment = Payment::create([
+            'user_id' => auth()->id(),
+            'gateway' => 'rajhi',
+            'amount' => 149.50, // السعر الإجمالي شامل الضريبة
+            'currency' => 'SAR',
+            'status' => 'pending',
+            'gateway_order_id' => \Illuminate\Support\Str::uuid()->toString(),
+            'description' => 'تمييز إعلان - ' . $post->title,
+            'payable_type' => 'App\\Models\\Post',
+            'payable_id' => $post->id,
+        ]);
+
+        // توجيه المستخدم لصفحة الدفع
+        return redirect()->route('payments.checkout', $payment->id);
+    }
 }

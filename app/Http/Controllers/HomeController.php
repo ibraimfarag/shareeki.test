@@ -41,6 +41,13 @@ class HomeController extends Controller
             array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
         }
 
-        return view('main.posts.index', ['countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'subcategories' => Category::whereNotNull('category_id')->get(), 'tags' => $tags , 'posts' => Post::latest()->paginate(20)]);
+        return view('main.posts.index', [
+            'countries' => Area::whereParentId(1)->orderBy('position')->get(),
+            'categories' => Category::whereNull('category_id')->get(),
+            'subcategories' => Category::whereNotNull('category_id')->get(),
+            'tags' => $tags,
+            'posts' => Post::where('is_featured', false)->latest()->paginate(20),
+            'featuredPosts' => Post::homeFeatured()->get()
+        ]);
     }
 }

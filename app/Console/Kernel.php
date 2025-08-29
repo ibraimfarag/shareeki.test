@@ -15,9 +15,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-            $schedule->command('ads:expire')->dailyAt('00:00');
-                $schedule->command('ads:expire')->dailyAt('12:00');
+        // فحص وإلغاء الإعلانات المنتهية
+        $schedule->command('ads:expire')->dailyAt('00:00');
+        $schedule->command('ads:expire')->dailyAt('12:00');
+
+        // فحص وإلغاء الإعلانات المميزة التي تجاوزت المدة
+        $schedule->command('posts:check-featured')->dailyAt('00:00');
+        $schedule->command('posts:check-featured')->dailyAt('12:00');
 
     }
 
@@ -28,7 +32,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

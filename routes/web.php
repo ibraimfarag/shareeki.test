@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\FeaturedPostController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SubcategoryController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -18,7 +20,7 @@ use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\PostEnumController;
 use App\Http\Controllers\Admin\BlackListController;
 use App\Http\Controllers\Admin\CountryController;
-use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\CityController as AdminCityController;
 use App\Http\Controllers\Admin\AdTypeController;
 
 use App\Http\Controllers\PageController;
@@ -50,17 +52,33 @@ use App\Http\Controllers\SearchController;
   return redirect('/home');
 });*/
 
-Route::post('/success', function (Request $request) {
-    return view('payments.success');
+// مسارات الدفع والمدفوعات
+Route::group(['prefix' => 'payments', 'middleware' => ['auth']], function () {
+    Route::get('/checkout/{payment}', [PaymentController::class, 'checkout'])->name('payments.checkout');
+    Route::post('/process', [PaymentController::class, 'process'])->name('payments.process');
+    Route::post('/verify-otp', [PaymentController::class, 'verifyOTP'])->name('payments.verify-otp');
+
+    // نجاح وفشل الدفع العام
+    Route::view('/success', 'payments.success')->name('payments.success');
+    Route::view('/error', 'payments.error')->name('payments.error');
+
+    // بوابة الراجحي للدفع
+    Route::prefix('rajhi')->name('rajhi.')->group(function () {
+        Route::get('/success', [PaymentController::class, 'handleSuccess'])->name('success');
+        Route::get('/error', [PaymentController::class, 'handleError'])->name('error');
+        Route::post('/webhook', [PaymentController::class, 'handleWebhook'])->name('webhook');
+        Route::get('/return', [PaymentController::class, 'handleReturn'])->name('return');
+    });
 });
 
-Route::get('http://digitalpayments.alrajhibank.com.sa/pg/Error.htm', function () {
-    return redirect()->to(url('/error'));
-});
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 
-Route::get('/error', function (Request $request) {
-    return view('payments.error');
-})->name('error_response');
+// صفحات سجل المدفوعات في لوحة التحكم
+Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
+    Route::get('/payments/{payment}/download', [AdminPaymentController::class, 'download'])->name('payments.download');
+});
 
 
 
@@ -86,7 +104,6 @@ Route::post('/payment', [PageController::class, 'payment'])->name('payment.proce
 Route::get('/success', function (Request $request) {
     echo "تمت عمليه  الدفع بنجاح";
 });
-Route::get('/ads/{id}/promote', [PostController::class, 'showPromote'])->name('ads.promote');
 
 //     Route::get('/ads/{post}/promote', function($postId) {
 //     return "Route works! Post ID: " . $postId;
@@ -95,6 +112,11 @@ Route::get('/ads/{id}/promote', [PostController::class, 'showPromote'])->name('a
 Route::post('/ads/{post}/calculate-price', [PostController::class, 'calculatePrice'])->name('ads.calculate-price');
 Route::post('/ads/{post}/checkout', [PostController::class, 'checkout'])->name('ads.checkout');
 
+// مسارات الإعلانات المميزة
+Route::middleware('auth')->group(function () {
+    Route::post('/posts/{pageID}/feature', [FeaturedPostController::class, 'feature'])->name('posts.feature');
+    Route::post('/posts/{post}/unfeature', [FeaturedPostController::class, 'unfeature'])->name('posts.unfeature');
+});
 
 Auth::routes(['verify' => true]);
 
@@ -104,6 +126,11 @@ Route::get('the_posts/{the_post}', [PostController::class, 'show'])->name('the_p
 // Posts
 Route::get('new_post', [PostController::class, 'create'])->name('the_posts.create');
 Route::post('new_post', [PostController::class, 'store'])->name('the_posts.store');
+
+// مسارات عرض تمييز الإعلان
+Route::get('posts/{id}/featured-offer', [PostController::class, 'showFeaturedOffer'])->name('posts.featured.offer');
+Route::get('posts/{id}/featured-checkout', [PostController::class, 'featuredCheckout'])->name('posts.featured.checkout');
+Route::get('posts/{id}/featured-confirm', [PostController::class, 'confirmFeatured'])->name('posts.featured.confirm');
 
 // user logout
 Route::get('userlogout', function () {
@@ -223,8 +250,8 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => 'admin'], function () {
 
 
     // Cities
-    Route::resource('countries/{country}/cities', CityController::class);
-    Route::get('countries/{country}/cities/{city}/delete', [CityController::class, 'destroy'])->name('cities.delete');
+    Route::resource('countries/{country}/cities', AdminCityController::class);
+    Route::get('countries/{country}/cities/{city}/delete', [AdminCityController::class, 'destroy'])->name('cities.delete');
 
 
 
@@ -274,15 +301,6 @@ Route::controller(FacebookController::class)->group(function () {
 // مسارات التمييز
 
 // });
-
-// مسارات بوابة الراجحي (خارج middleware auth)
-// Route::get('/payments/rajhi/return', [PostController::class, 'showPromote'])->name('payments.rajhi.return');
-// Route::post('/payments/rajhi/webhook', [PaymentController::class, 'webhook'])->name('payments.rajhi.webhook');
-
-
-
-
-
 
 // routes/web.php
 

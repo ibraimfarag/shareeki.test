@@ -309,7 +309,7 @@
     <!-- Paid Opportunities section -->
 
     @if ($paidPosts->count() > 0)
-        <section class="opportunities-block wrap position-relative mt-3 mb-5" id="services">
+        <section class="opportunities-block wrap fut-sec mt-3 mb-5" id="services">
             <div class="container">
                 <h2 class="h2 text-dark-heading text-left mb-0">الفرص المميزة</h2>
                 <div class="row align-items-center ads-new-cards">
