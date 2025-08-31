@@ -432,6 +432,15 @@
             <p class="text-dark-content mt-3">
                الرجاء تسجيل الدخول
             </p>
+            <div class="alert alert-info text-start">
+               <h6>تفاصيل الإعلان:</h6>
+               <ul>
+                  <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
+                  <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
+                  <li><strong>الإجمالي:</strong> 149.50 ريال</li>
+                  <li><strong>المدة:</strong> من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</li>
+               </ul>
+            </div>
             <a href="{{ asset('login') }}" type="button" class="btn main-btn gold-btn medium-btn rounded"> تسجيل الدخول
             </a>
             <button type="button" class="btn main-btn blue-btn medium-btn rounded" data-bs-dismiss="modal"> ربما

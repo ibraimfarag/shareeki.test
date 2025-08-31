@@ -104,10 +104,24 @@
                                         <h5>تفاصيل الطلب</h5>
                                         <p>تمييز الإعلان: {{ $payment->description }}</p>
                                         <p>رقم الطلب: #{{ $payment->id }}</p>
+                                        <p>الفترة:
+                                            @if($payment->payable && $payment->payable->created_at && $payment->payable->featured_until)
+                                                من {{ $payment->payable->created_at->format('Y-m-d') }}
+                                                إلى {{ $payment->payable->featured_until->format('Y-m-d') }}
+                                            @else
+                                                من {{ now()->format('Y-m-d') }}
+                                                إلى {{ now()->addMonths(3)->format('Y-m-d') }}
+                                            @endif
+                                        </p>
                                     </div>
                                     <div class="col-md-6 text-md-end">
-                                        <h5>المبلغ المطلوب</h5>
-                                        <h3 class="text-primary">{{ number_format($payment->amount, 2) }} ريال</h3>
+                                        <h5>تفاصيل المبلغ</h5>
+                                        <ul class="list-unstyled">
+                                            <li>قيمة الإعلان: 130.00 ريال</li>
+                                            <li>ضريبة القيمة المضافة: 19.50 ريال</li>
+                                            <li><strong>الإجمالي: {{ number_format($payment->amount, 2) }} ريال</strong>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

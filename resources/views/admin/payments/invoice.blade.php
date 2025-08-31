@@ -103,7 +103,7 @@
         <table>
             <tr>
                 <th>تاريخ العملية</th>
-                <td>{{ $payment->created_at->format('Y-m-d H:i') }}</td>
+                <td>{{ $payment->created_at ? $payment->created_at->format('Y-m-d H:i') : 'غير متوفر' }}</td>
             </tr>
             <tr>
                 <th>اسم المستخدم</th>
@@ -157,6 +157,24 @@
             <tr>
                 <th>المبلغ</th>
                 <td class="amount">{{ number_format($payment->amount, 2) }} ريال</td>
+            </tr>
+            <tr>
+                <th>تفاصيل المبلغ</th>
+                <td>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>قيمة الإعلان: {{ number_format($payment->amount, 2) }} ريال</li>
+                        <li>ضريبة القيمة المضافة: {{ number_format($payment->amount * 0.15, 2) }} ريال</li>
+                        <li>الإجمالي: {{ number_format($payment->amount * 1.15, 2) }} ريال</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th>فترة الإعلان</th>
+                <td>
+                    من {{ $payment->payable->created_at->format('Y-m-d') }}
+                    إلى
+                    {{ $payment->payable->featured_until ? $payment->payable->featured_until->format('Y-m-d') : 'غير متوفر' }}
+                </td>
             </tr>
         </table>
     </div>

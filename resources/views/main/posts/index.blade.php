@@ -15,6 +15,50 @@
             overflow: inherit !important;
             white-space: inherit;
         }
+
+        .card.box-shadow-medium.border-radius-medium.card-hover {
+            padding: 1.5rem;
+            line-height: 1.6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+
+        @media (max-width: 676px) {
+
+
+            .card.box-shadow-medium.border-radius-medium.card-hover {
+                padding: 0;
+
+            }
+
+            .ads-mobile {
+
+                width: 250px
+            }
+
+        }
+
+
+        .card.box-shadow-medium.border-radius-medium.card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card.box-shadow-medium.border-radius-medium.card-hover .card-body {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .card.box-shadow-medium.border-radius-medium.card-hover .card-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card.box-shadow-medium.border-radius-medium.card-hover .card-text {
+            margin-bottom: 1rem;
+        }
     </style>
 @endsection
 
@@ -309,46 +353,113 @@
     <!-- Paid Opportunities section -->
 
     @if ($paidPosts->count() > 0)
-        <section class="opportunities-block wrap fut-sec mt-3 mb-5" id="services">
+        <!-- Section for large screens -->
+        <section class="opportunities-block wrap fut-sec d-none d-lg-block" id="services">
             <div class="container">
                 <h2 class="h2 text-dark-heading text-left mb-0">الفرص المميزة</h2>
-                <div class="row align-items-center ads-new-cards">
+                <div class="car-d">
                     <!-- card -->
                     @foreach ($paidPosts as $paidPost)
-                        <div class="col-lg-3 mt-2">
-
+                        <div class="mt-2 margin-right-ads">
                             <a href="{{ route('the_posts.show', $paidPost->id) }}">
-                                <div class="card box-shadow-medium border-radius-medium card-hover">
-                                    <img src="{{ $paidPost->img != null ? $paidPost->img_path : $paidPost->category->img_path ?? '' }}"
+                                <div class="card box-shadow-medium border-radius-medium card-hover ad-h">
+                                    <img class="img-ad"
+                                        src="{{ $paidPost->img != null ? $paidPost->img_path : $paidPost->category->img_path ?? '' }}"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
-                                        <h4 class="h4 card-title text-dark-heading mb-2 line-clamp2">
-                                            {{ $paidPost->category->name ?? 'غير محدد' }}</h4>
-                                        <h3 class="h4 card-text text-dark-content mb-0 line-clamp2">{{ $paidPost->title }}</h3>
+                                        <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
+                                            {{ $paidPost->category->name ?? 'غير محدد' }}
+                                        </h4>
+                                        <h3 class="h4 card-text text-dark-content mb-3 line-clamp2">{{ $paidPost->title }}</h3>
                                     </div>
                                     <div class="card-footer bg-transparent">
-                                        <h5 class="h4 text-blue-light-heading">المبلغ المطلوب {{ number_format($paidPost->price) }}
-                                            ريال</h5>
+                                        <h5 class="h4 text-blue-light-heading mb-0">المبلغ المطلوب
+                                            {{ number_format($paidPost->price) }}
+                                            ريال
+                                        </h5>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     @endforeach
-                    <!-- card -->
 
+                    @for ($i = $paidPosts->count(); $i < 4; $i++)
+                        <div class="mt-2">
+                            <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space ad-h">
+                                <div class="card-body text-center">
+                                    <h4 class="h4 card-title text-dark-heading mb-2">اغتنم الفرصة الآن!</h4>
+                                    <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
+                                        الشركاء المناسبين😎🤝
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endfor
                 </div>
 
             </div>
 
         </section>
-        
+
+        <!-- Section for mobile screens -->
+        <section class="opportunities-block wrap fut-sec d-block d-lg-none" id="services-mobile" style="margin-bottom: 0.5rem;">
+            <div class="container" style="padding: 0.2rem 0;">
+                <h2 class="h2 text-dark-heading text-center mb-1" style="font-size: 1rem; font-weight: bold; color: #007bff;">
+                    الفرص المميزة</h2>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <!-- card -->
+                        @foreach ($paidPosts as $paidPost)
+                            <div class="swiper-slide">
+                                <div class="card box-shadow-medium border-radius-medium card-hover"
+                                    style="max-width: 70%; margin: 0 auto;">
+                                    <a href="{{ route('the_posts.show', $paidPost->id) }}">
+                                        <img class="img-ad"
+                                            src="{{ $paidPost->img != null ? $paidPost->img_path : $paidPost->category->img_path ?? '' }}"
+                                            class="card-img-top" alt="...">
+                                        <div class="card-body">
+                                            <h4 class="h4 card-title text-dark-heading mb-1 line-clamp2">
+                                                {{ $paidPost->category->name ?? 'غير محدد' }}
+                                            </h4>
+                                            <h3 class="h4 card-text text-dark-content mb-1 line-clamp2">{{ $paidPost->title }}</h3>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <h5 class="h4 text-blue-light-heading mb-0">المبلغ المطلوب
+                                                {{ number_format($paidPost->price) }}
+                                                ريال
+                                            </h5>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        @for ($i = $paidPosts->count(); $i < 4; $i++)
+                            <div class="swiper-slide">
+                                <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space"
+                                    style="max-width: 70%; margin: 0 auto;">
+                                    <div class="card-body text-center">
+                                        <h4 class="h4 card-title text-dark-heading mb-1">اغتنم الفرصة الآن!</h4>
+                                        <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
+                                            الشركاء المناسبين😎🤝
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                    <!-- Add Progress Bar -->
+                    <div class="swiper-pagination swiper-pagination-progressbar"></div>
+                </div>
+            </div>
+        </section>
     @endif
 
 
 
     <!--  -->
     <!-- Opportunities section -->
-    <section class="opportunities-block wrap position-relative mt-3 mb-5" id="services">
+    <section class="opportunities-block wrap position-relative margin-top-30 mb-5" id="services">
         <div class="container">
             <h2 class="h2 text-dark-heading text-left mb-0">الفرص المتاحة</h2>
             <div class="row align-items-center ads-new-cards">
@@ -361,12 +472,19 @@
                                 <img src="{{ $post->img != null ? $post->img_path : $post->category->img_path ?? '' }}"
                                     class="card-img-top" alt="...">
                                 <div class="card-body">
-                                    <h4 class="h4 card-title text-dark-heading mb-2 line-clamp2">
-                                        {{ $post->category->name ?? 'غير محدد' }}</h4>
-                                    <h3 class="h4 card-text text-dark-content mb-0 line-clamp2">{{ $post->title }}</h3>
+                                    <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
+                                        {{ $post->category->name ?? 'غير محدد' }}
+                                    </h4>
+                                    <h3 class="h4 card-text text-dark-content mb-3 line-clamp2" style="word-wrap: break-word;">
+                                        {{ $post->title }}
+                                    </h3>
                                 </div>
                                 <div class="card-footer bg-transparent">
-                                    <h5 class="h4 text-blue-light-heading">المبلغ المطلوب {{ number_format($post->price) }} ريال
+
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <h5 class="h4 text-blue-light-heading mb-0 text-wrap">المبلغ المطلوب
+                                        {{ number_format($post->price) }} ريال
                                     </h5>
                                 </div>
                             </div>
@@ -393,7 +511,7 @@
 
 
     <!-- pagination -->
-    <div class="container deletePagination">
+    <div class="container deletePagination mar-18">
         <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
@@ -491,7 +609,7 @@
             };
 
             @auth
-                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -502,12 +620,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                    <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                      <p class="h4">
-                      لا توجد اي معلومات مطابقة
-                      </p>
-                   </div>
-                    </div>`);
+                            <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                              <p class="h4">
+                              لا توجد اي معلومات مطابقة
+                              </p>
+                           </div>
+                            </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
@@ -562,5 +680,32 @@
 
             })
         }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new Swiper('.swiper-container', {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    type: 'progressbar',
+                },
+                breakpoints: {
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    576: {
+                        slidesPerView: 1,
+                    },
+                },
+            });
+        });
     </script>
 @endsection

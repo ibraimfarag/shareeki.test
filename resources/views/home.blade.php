@@ -473,12 +473,17 @@
             Swal.fire({
                 title: 'تأكيد تمييز الإعلان',
                 html: `
-                        <div class="text-right">
-                            <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
-                            <p>مدة التمييز: <strong>3</strong> أشهر</p>
-                            <p>سيظهر إعلانك في القسم المميز في أعلى الصفحة الرئيسية</p>
-                        </div>
-                    `,
+                            <div class="text-right">
+                                <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
+                                <p>يشمل:</p>
+                                <ul>
+                                    <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
+                                    <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
+                                </ul>
+                                <p>الفترة: من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</p>
+                                <p>سيتم إصدار فاتورة وإيصال تلقائيًا.</p>
+                            </div>
+                        `,
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
