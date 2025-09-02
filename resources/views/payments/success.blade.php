@@ -85,7 +85,7 @@
                     <div class="content" data-sal="slide-up" data-sal-duration="800" data-sal-delay="400">
                         <h2 class="title">نتمنى لك رحلة<br> شراكة سعيدة</h2>
 
-                        <a href="https://shareeki.net/" class="axil-btn btn-fill-primary">العوده للرئيسيه</a>
+                        <a href="/" class="axil-btn btn-fill-primary">العوده للرئيسيه</a>
                     </div>
                 </div>
                 <div class="col-lg-6">

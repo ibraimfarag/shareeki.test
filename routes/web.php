@@ -72,12 +72,17 @@ Route::group(['prefix' => 'payments', 'middleware' => ['auth']], function () {
 });
 
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\CommissionPaymentController;
 
 // صفحات سجل المدفوعات في لوحة التحكم
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
     Route::get('/payments/{payment}/download', [AdminPaymentController::class, 'download'])->name('payments.download');
+
+    // سجل مدفوعات العمولة
+    Route::get('commission-payments', [CommissionPaymentController::class, 'index'])->name('commission_payments.index');
+    Route::get('commission-payments/{id}', [CommissionPaymentController::class, 'show'])->name('commission_payments.show');
 });
 
 

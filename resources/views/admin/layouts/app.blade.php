@@ -232,6 +232,7 @@
                 <div id="sidebar-menu">
                     <!-- Left Menu Start -->
                     <ul class="metismenu list-unstyled" id="side-menu">
+
                         <li>
                             <a style="color: #fafafa !important" href="{{ asset('admin\dashboard') }}"
                                 class="waves-effect">
@@ -358,7 +359,14 @@
                                 <span> المدفوعات </span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{{ route('admin.payments.index') }}">سجل المدفوعات</a></li>
+                                <li><a href="{{ route('admin.payments.index') }}">سجل مدفوعات الاعلانات المميزة</a></li>
+
+                                <li>
+                                    <a href="{{ route('admin.commission_payments.index') }}">
+                                        <i class="mdi mdi-cash-multiple"></i>
+                                        <span>سجل مدفوعات العمولة</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
@@ -369,8 +377,8 @@
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
                                 <li><a href="{{asset('admin/the_settings')}}"> إعدادات الموقع </a></li>
-                                <li><a href="{{ route('admin.ad-types.index') }}"> إعدادات الإعلانات المميزة </a></li>
-                                <li><a href="{{ route('admin.pricing-rules.index') }}"> قواعد التسعير </a></li>
+                                {{-- <li><a href="{{ route('admin.ad-types.index') }}"> إعدادات الإعلانات المميزة </a></li> --}}
+                                {{-- <li><a href="{{ route('admin.pricing-rules.index') }}"> قواعد التسعير </a></li> --}}
                             </ul>
                         </li>
 

@@ -26,7 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -40,7 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'id';
     }
 
     public function posts()
@@ -50,6 +51,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     //public function setPasswordAttribute($value){
 
-        //$this->attributes['password'] = bcrypt($value);
+    //$this->attributes['password'] = bcrypt($value);
     //}
 }

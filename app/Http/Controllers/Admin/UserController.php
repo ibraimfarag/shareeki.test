@@ -22,12 +22,18 @@ class UserController extends Controller
             $users = User::orderByDesc('id')->get();
 
             return DataTables::of($users)->addIndexColumn()
-            ->addcolumn('email_verified_at', function($row){ $btn = $row->email_verified_at == null ? 'غير مفعل' : 'مفعل'; return $btn; })
-            ->addcolumn('action', function($row){ $btn = '<a href="'.route("users.edit", $row->name) . '" class="btn btn-warning">تعديل</a>'; return $btn; })
-            ->addcolumn('actionone', function($row){ $btn = '<a href="'.route("users.delete", [$row->name]).'" class="delete btn btn-danger btn-sm">حذف</a>'; return $btn; })
-            ->rawColumns(['action','actionone'])
-            ->addIndexColumn()
-            ->make(true);
+                ->addcolumn('email_verified_at', function ($row) {
+                    $btn = $row->email_verified_at == null ? 'غير مفعل' : 'مفعل';
+                    return $btn; })
+                ->addcolumn('action', function ($row) {
+                    $btn = '<a href="' . route("users.edit", $row->name) . '" class="btn btn-warning">تعديل</a>';
+                    return $btn; })
+                ->addcolumn('actionone', function ($row) {
+                    $btn = '<a href="' . route("users.delete", [$row->name]) . '" class="delete btn btn-danger btn-sm">حذف</a>';
+                    return $btn; })
+                ->rawColumns(['action', 'actionone'])
+                ->addIndexColumn()
+                ->make(true);
 
         }
 
@@ -64,7 +70,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return view('admin.users.show', ['user' => $user]);
     }
 
     /**
@@ -87,10 +93,10 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        
+
         //$request->merge(['password' => bcrypt($request->password)]);
         $user->update($request->all());
-      
+
         return redirect('/admin/users');
     }
 
