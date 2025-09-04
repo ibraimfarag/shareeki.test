@@ -30,7 +30,14 @@ class PhoneVerificationController extends Controller
                 'phone' => $request->phone,
                 'trace' => $e->getTraceAsString(),
             ]);
-            return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء إرسال الكود.']);
+            $message = $e->getMessage();
+            // إذا كان الخطأ من الفاليديشن
+            if (method_exists($e, 'errors')) {
+                $errors = $e->errors();
+                $message = is_array($errors) ? implode('، ', array_map(function ($v) {
+                    return is_array($v) ? implode('، ', $v) : $v; }, $errors)) : $message;
+            }
+            return response()->json(['success' => false, 'message' => $message]);
         }
     }
 }
