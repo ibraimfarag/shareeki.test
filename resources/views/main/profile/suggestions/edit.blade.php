@@ -42,7 +42,7 @@
                         </div>
 
 
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label for="mobile" class="col-md-2 col-form-label text-md-right">الجوال</label>
                         
                             <div class="col-md-10">
@@ -54,7 +54,7 @@
                                     </span>
                                 @enderror
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="form-group row">
                             <label for="max_budget" class="col-md-2 col-form-label text-md-right">الميزانية القصوى للإستثمار</label>

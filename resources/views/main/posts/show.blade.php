@@ -328,12 +328,12 @@
                         @else
                         <div class="collapse" id="showNumber">
                            <div>
-                              <div class="personal-info--item mb-4">
+                              {{-- <div class="personal-info--item mb-4">
                                  <h4 class="h4 text-dark-heading">الجوال</h4>
                                  <h5 class="h5 text-dark-content">
                                     {{ $post->phone }}
                                  </h5>
-                              </div>
+                              </div> --}}
                               @if($post->email == 1)
                                  <div class="personal-info--item mb-4">
                                     <h4 class="h4 text-dark-heading">البريد الاكتروني</h4>

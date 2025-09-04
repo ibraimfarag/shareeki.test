@@ -139,6 +139,10 @@ class PostController extends Controller
      */
     public function create()
     {
+        $user = auth()->user();
+        if (!$user || empty($user->phone)) {
+            return redirect()->route('get_personal_info')->withErrors(['phone' => 'يجب إضافة رقم الجوال أولاً قبل إضافة فرصة جديدة.']);
+        }
         $theTags = Tag::whereNotNull('id')->get();
         $tags = [];
         foreach ($theTags as $tag) {
@@ -170,23 +174,18 @@ class PostController extends Controller
 
         /*----- in case of user not authenticated -----*/
         if ($request->not_logged_in) {
-
             if ($request->has('main_image'))
                 session()->put('image', Upload::uploadImage($request->main_image, 'temp', $request->title));
-
-
-            // Add The Attachments
-            /*if($request->has('the_attachment')){
-                foreach ($request->the_attachment as $attachment) {
-                    Attachment::create(['post_id' => $the_post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}" , $postName."_".rand(0,100000))]);
-                }
-            }*/
-
             session()->put('post', $request->except('main_image'));
-
             return redirect()->route('login');
         }
         /*----- in case of user not authenticated -----*/
+
+        // منع المستخدم غير المفعّل للجوال من إضافة إعلان
+        $user = auth()->user();
+        if (!$user->phone_verified_at) {
+            return redirect()->route('get_personal_info')->with('error', 'يجب تفعيل رقم الجوال أولاً قبل إضافة إعلان جديد.');
+        }
 
         $request->full_partnership != "on" ?: $partner_sort[0] = "on";
         $request->loan != "on" ?: $partner_sort[1] = "on";
@@ -594,4 +593,10 @@ class PostController extends Controller
         // توجيه المستخدم لصفحة الدفع
         return redirect()->route('payments.checkout', $payment->id);
     }
+
+
+
+    /**
+     * منع إضافة فرصة إذا لم يكن لدى المستخدم رقم جوال
+     */
 }

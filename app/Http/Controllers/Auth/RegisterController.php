@@ -6,69 +6,80 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
-    use RegistersUsers;
-
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
     protected $redirectTo = RouteServiceProvider::HOME;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest');
     }
 
     /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * عرض صفحة التسجيل
      */
-    protected function validator(array $data)
+    public function showRegistrationForm()
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'check_terms' => ['required'],
-        ]);
+        return view('auth.register');
     }
 
     /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
+     * تنفيذ التسجيل يدويًا
      */
-    protected function create(array $data)
+    public function register(Request $request)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+        $data = $request->all();
+        // إزالة + من بداية رقم الهاتف إن وجدت
+        if (isset($data['phone_full'])) {
+            $data['phone_full'] = ltrim($data['phone_full'], '+');
+        }
+        $validator = Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone_full' => ['required', 'regex:/^(966|971|965|973|968|974)[0-9]{7,12}$/', 'unique:users,phone'],
+            'phone_code' => ['required', 'digits:4'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'check_terms' => ['required'],
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        try {
+            $phone = $data['phone_full'];
+            \Log::info('بدء التسجيل', ['phone' => $phone, 'data' => $data]);
+            $code = Cache::get('phone_verification_' . $phone);
+            if (!$code || $data['phone_code'] != $code) {
+                \Log::error('كود التفعيل غير صحيح أو منتهي الصلاحية', [
+                    'phone' => $phone,
+                    'input_code' => $data['phone_code'],
+                    'cache_code' => $code,
+                ]);
+                return redirect()->back()->withErrors(['phone_code' => 'كود التفعيل غير صحيح أو منتهي الصلاحية'])->withInput();
+            }
+            \Log::info('كود التفعيل صحيح', ['phone' => $phone, 'code' => $code]);
+            Cache::forget('phone_verification_' . $phone);
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $phone,
+                'phone_verified_at' => now(),
+                'password' => Hash::make($data['password']),
+            ]);
+            auth()->login($user);
+            session()->flash('success', 'تم التسجيل بنجاح!');
+            \Log::info('تم التسجيل بنجاح', ['user_id' => $user->id, 'phone' => $phone]);
+            return redirect($this->redirectTo);
+        } catch (\Exception $e) {
+            \Log::error('خطأ أثناء التسجيل: ' . $e->getMessage(), [
+                'data' => $data,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return redirect()->back()->withErrors(['general' => 'حدث خطأ أثناء التسجيل'])->withInput();
+        }
     }
 }

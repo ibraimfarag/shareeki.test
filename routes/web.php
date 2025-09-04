@@ -34,12 +34,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\CommissionPaymentController;
 
+use App\Http\Controllers\Auth\RegisterController;
 
+use App\Http\Controllers\Auth\PhoneVerificationController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
+// راوت التسجيل منفصل
+use App\Http\Controllers\Auth\RegisterController;
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
@@ -51,6 +59,11 @@ use App\Http\Controllers\SearchController;
 /*Route::get('/', function(){
   return redirect('/home');
 });*/
+
+
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
+
 
 // مسارات الدفع والمدفوعات
 Route::group(['prefix' => 'payments', 'middleware' => ['auth']], function () {
@@ -71,8 +84,6 @@ Route::group(['prefix' => 'payments', 'middleware' => ['auth']], function () {
     });
 });
 
-use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
-use App\Http\Controllers\Admin\CommissionPaymentController;
 
 // صفحات سجل المدفوعات في لوحة التحكم
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -272,8 +283,6 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => 'admin'], function () {
 
     });
 });
-
-
 /*---------------- General ------------------*/
 
 //Get All Areas (Countries And Cities)
@@ -309,3 +318,4 @@ Route::controller(FacebookController::class)->group(function () {
 
 // routes/web.php
 
+Route::post('phone/send-code', [PhoneVerificationController::class, 'sendCode'])->name('phone.send.code');

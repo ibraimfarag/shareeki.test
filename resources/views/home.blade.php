@@ -424,11 +424,11 @@
                                     max="<?= date('Y-m-d'); ?>" id="birth_date" name="birth_date" autocomplete="birth_date"
                                     required>
                             </div>
-                            <div class="col-md-12">
+                            {{-- <div class="col-md-12">
                                 <label for="mobile" class="form-label"> الجوال </label>
-                                <input type="text" class="form-control" value="{{ auth()->user()->mobile }}" id="mobile"
+                                <input type="text" class="form-control" value="{{ auth()->user()->phone }}" id="mobile"
                                     name="mobile" maxlength="15" autocomplete="mobile" required>
-                            </div>
+                            </div> --}}
                             <div class="col-md-12">
                                 <label for="max_budget" class="form-label"> الميزانية القصوى المتاحة للدخول فى الفرص التجارية
                                 </label>
