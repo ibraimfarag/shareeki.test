@@ -125,8 +125,6 @@ Route::get('/success', function (Request $request) {
 //     return "Route works! Post ID: " . $postId;
 // });
 
-Route::post('/ads/{post}/calculate-price', [PostController::class, 'calculatePrice'])->name('ads.calculate-price');
-Route::post('/ads/{post}/checkout', [PostController::class, 'checkout'])->name('ads.checkout');
 
 // مسارات الإعلانات المميزة
 Route::middleware('auth')->group(function () {

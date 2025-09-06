@@ -61,7 +61,7 @@ class PostController extends Controller
             'code',
             'user_id',
             'category_id',
-            'ad_type_id',
+        
             'title',
             'slug',
             'img',
@@ -441,88 +441,7 @@ class PostController extends Controller
     }
 
 
-    public function calculatePrice(Request $request, Post $post, AdPricingService $pricing)
-    {
-        $request->validate([
-            'ad_type_id' => 'required|exists:ad_types,id',
-            'duration_value' => 'required|integer|min:1|max:365',
-            'duration_unit' => 'required|in:day,week,month',
-        ]);
-
-        // إنشاء نسخة مؤقتة من الإعلان للتسعير
-        $tempPost = $post->replicate()->fill([
-            'ad_type_id' => $request->ad_type_id,
-            'category_id' => $post->category_id
-        ]);
-
-        $quote = $pricing->quote(
-            $tempPost,
-            $request->duration_value,
-            $request->duration_unit
-        );
-
-        return response()->json($quote);
-    }
-
-    public function checkout(Request $request, Post $post, AdPricingService $pricing, RajhiGateway $gateway)
-    {
-        $this->authorize('update', $post);
-
-        $request->validate([
-            'ad_type_id' => 'required|exists:ad_types,id',
-            'duration_value' => 'required|integer|min:1|max:365',
-            'duration_unit' => 'required|in:day,week,month',
-        ]);
-
-        // التأكد أن الإعلان قابل للترقية
-        $isActive = $post->status === 'active' && (is_null($post->ends_at) || $post->ends_at->gte(now()));
-        $canPromote = !$post->is_paid || !$isActive;
-
-        if (!$canPromote) {
-            return back()->with('error', 'هذا الإعلان مميز ونشط بالفعل');
-        }
-
-        // حساب السعر النهائي
-        $tempPost = $post->replicate()->fill(['ad_type_id' => $request->ad_type_id]);
-        $quote = $pricing->quote($tempPost, $request->duration_value, $request->duration_unit);
-
-        // تحديث الإعلان مؤقتاً
-        $post->update([
-            'ad_type_id' => $request->ad_type_id,
-            'pricing_snapshot' => $quote,
-            'status' => 'pending_payment',
-        ]);
-
-        // إنشاء دفعة جديدة
-        $payment = Payment::create([
-            'user_id' => auth()->id(),
-            'gateway' => 'rajhi',
-            'amount' => $quote['total'],
-            'currency' => config('rajhi.currency', 'SAR'),
-            'status' => 'pending',
-            'gateway_order_id' => Str::uuid()->toString(),
-        ]);
-        $payment->payable()->associate($post)->save();
-
-        try {
-            // التوجيه لبوابة الراجحي
-            $redirectUrl = $gateway->createPayment($payment, [
-                'name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-            ], [
-                'post_title' => $post->title,
-                'post_id' => $post->id,
-            ]);
-
-            return redirect()->away($redirectUrl);
-        } catch (\Exception $e) {
-            // في حال فشل إنشاء الدفعة، إرجاع الحالة
-            $post->update(['status' => 'draft']);
-            $payment->update(['status' => 'failed']);
-
-            return back()->with('error', 'حدث خطأ في معالجة الدفع: ' . $e->getMessage());
-        }
-    }
+  
 
     public function showFeaturedOffer($id)
     {
