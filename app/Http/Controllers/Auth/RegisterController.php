@@ -20,21 +20,16 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * عرض صفحة التسجيل
-     */
+
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    /**
-     * تنفيذ التسجيل يدويًا
-     */
+
     public function register(Request $request)
     {
         $data = $request->all();
-        // إزالة + من بداية رقم الهاتف إن وجدت
         if (isset($data['phone_full'])) {
             $data['phone_full'] = ltrim($data['phone_full'], '+');
         }
@@ -63,17 +58,39 @@ class RegisterController extends Controller
             }
             \Log::info('كود التفعيل صحيح', ['phone' => $phone, 'code' => $code]);
             Cache::forget('phone_verification_' . $phone);
-            $user = User::create([
+
+            $emailVerificationEnabled = config('app.EMAIL_VERIFICATION_ENABLED');
+            if ($emailVerificationEnabled === null) {
+                $emailVerificationEnabled = env('EMAIL_VERIFICATION_ENABLED', true);
+            }
+
+            $userData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $phone,
                 'phone_verified_at' => now(),
                 'password' => Hash::make($data['password']),
-            ]);
+            ];
+
+            if ($emailVerificationEnabled) {
+                unset($userData['email_verified_at']);
+            } else {
+                $userData['email_verified_at'] = now();
+            }
+
+            $user = User::create($userData);
             auth()->login($user);
-            session()->flash('success', 'تم التسجيل بنجاح!');
-            \Log::info('تم التسجيل بنجاح', ['user_id' => $user->id, 'phone' => $phone]);
-            return redirect($this->redirectTo);
+
+            if ($emailVerificationEnabled) {
+                $user->sendEmailVerificationNotification();
+                session()->flash('success', 'تم التسجيل بنجاح! يرجى تفعيل البريد الإلكتروني.');
+                \Log::info('تم التسجيل بنجاح مع طلب تفعيل البريد', ['user_id' => $user->id, 'phone' => $phone]);
+                return redirect()->route('verification.notice');
+            } else {
+                session()->flash('success', 'تم التسجيل بنجاح!');
+                \Log::info('تم التسجيل بنجاح بدون تفعيل البريد', ['user_id' => $user->id, 'phone' => $phone]);
+                return redirect($this->redirectTo);
+            }
         } catch (\Exception $e) {
             \Log::error('خطأ أثناء التسجيل: ' . $e->getMessage(), [
                 'data' => $data,

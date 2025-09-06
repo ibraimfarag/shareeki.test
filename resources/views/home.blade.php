@@ -1,13 +1,30 @@
 @extends('main.layouts.app')
 @section('header')
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- إضافة Bootstrap CSS و JS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         body {
             overflow-y: scroll;
+        }
+
+        /* إصلاح مشكلة dropdown في النافبار */
+        .dropdown-toggle {
+            cursor: pointer !important;
+            user-select: none;
+        }
+
+        .dropdown-toggle:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .dropdown-menu {
+            z-index: 1050 !important;
+            min-width: 600px;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
 
         /* تنسيق Tooltip المخصص */
@@ -467,23 +484,65 @@
                     delay: { show: 50, hide: 50 }
                 });
             });
+
+            // إصلاح مشكلة الدروب داون
+            const dropdownToggle = document.getElementById('servicesDropdown');
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    console.log('Dropdown clicked'); // للتأكد من أن الحدث يعمل
+
+                    const dropdownMenu = this.nextElementSibling;
+                    if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                        // تبديل عرض القائمة
+                        if (dropdownMenu.classList.contains('show')) {
+                            dropdownMenu.classList.remove('show');
+                            this.setAttribute('aria-expanded', 'false');
+                        } else {
+                            // إخفاء جميع القوائم الأخرى أولاً
+                            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                                menu.classList.remove('show');
+                            });
+                            document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(toggle => {
+                                toggle.setAttribute('aria-expanded', 'false');
+                            });
+
+                            // إظهار القائمة الحالية
+                            dropdownMenu.classList.add('show');
+                            this.setAttribute('aria-expanded', 'true');
+                        }
+                    }
+                });
+            }
+
+            // إغلاق الدروب داون عند النقر خارجه
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.dropdown')) {
+                    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                    document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(toggle => {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            });
         });
 
         function featurePost(postId) {
             Swal.fire({
                 title: 'تأكيد تمييز الإعلان',
                 html: `
-                            <div class="text-right">
-                                <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
-                                <p>يشمل:</p>
-                                <ul>
-                                    <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
-                                    <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
-                                </ul>
-                                <p>الفترة: من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</p>
-                                <p>سيتم إصدار فاتورة وإيصال تلقائيًا.</p>
-                            </div>
-                        `,
+                                <div class="text-right">
+                                    <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
+                                    <p>يشمل:</p>
+                                    <ul>
+                                        <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
+                                        <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
+                                    </ul>
+                                    <p>الفترة: من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</p>
+                                    <p>سيتم إصدار فاتورة وإيصال تلقائيًا.</p>
+                                </div>
+                            `,
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',

@@ -14,7 +14,6 @@ class PhoneVerificationController extends Controller
 
         try {
             $phone = ltrim($request->phone, '+');
-            // دمج الرقم المعدل في الريكوست للفاليديشن
             $request->merge(['phone' => $phone]);
             $request->validate([
                 'phone' => ['required', 'regex:/^[0-9]{9,15}$/', 'unique:users,phone'],
@@ -22,7 +21,7 @@ class PhoneVerificationController extends Controller
             $code = rand(1000, 9999);
             Cache::put('phone_verification_' . $phone, $code, now()->addMinutes(10));
             $sms = new SmsService();
-            // $sms->send($phone, 'كود التفعيل الخاص بك هو: ' . $code);
+            $sms->send($phone, 'شريكي العزيز 🤝، حياك😎 رمز المرور OTP الخاص فيك لاستكمال التسجيل:' . $code);
             \Log::info('تم إرسال كود التفعيل بنجاح', ['phone' => $phone, 'code' => $code]);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
@@ -31,7 +30,6 @@ class PhoneVerificationController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             $message = $e->getMessage();
-            // إذا كان الخطأ من الفاليديشن
             if (method_exists($e, 'errors')) {
                 $errors = $e->errors();
                 $message = is_array($errors) ? implode('، ', array_map(function ($v) {

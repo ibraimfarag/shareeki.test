@@ -88,7 +88,7 @@
                                 دخول
                             </button>
                         </form>
-
+{{-- 
 
                         <div class="border-top mt-4 pt-3">
                             <h3 class="h3 text-dark-heading mb-3 text-center mt-2">
@@ -117,7 +117,7 @@
                                     </svg>
                                 </a>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
