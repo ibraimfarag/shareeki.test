@@ -92,7 +92,6 @@ class PostController extends Controller
 
         $Posts = Post::query()
             ->where('blacklist', 0)
-            ->where('is_paid', false)
             ->with($with)
             ->select($baseSelect)
             ->latest('created_at')
