@@ -247,7 +247,6 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => 'admin'], function () {
     Route::get('delete_attachment/{id}', [AttachmentController::class, 'delete'])->name('attachments.delete');
 
     // Post Enumerations
-    Route::get('posts/type_enum/featured', [PostEnumController::class, 'featured'])->name('featured_posts');
     Route::get('posts/type_enum/most_liked', [PostEnumController::class, 'mostLiked'])->name('most_liked_posts');
     Route::get('posts/type_enum/most_disliked', [PostEnumController::class, 'mostDisLiked'])->name('most_disliked_posts');
     Route::get('posts/type_enum/most_reported', [PostEnumController::class, 'mostReported'])->name('most_reported_posts');

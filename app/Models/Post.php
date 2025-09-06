@@ -38,9 +38,6 @@ class Post extends Model
         'starts_at',
         'ends_at',
         'pinned_at',
-        'featured_rank',
-        'pricing_snapshot',
-        'payment_id',
         'is_featured',
         'featured_until'
     ];

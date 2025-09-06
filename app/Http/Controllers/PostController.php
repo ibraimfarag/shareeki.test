@@ -66,17 +66,10 @@ class PostController extends Controller
             'slug',
             'img',
             'price',
-            'is_paid',
-            'features',
-            'status',
-            'starts_at',
-            'ends_at',
-            'pinned_at',
-            'featured_rank',
             'created_at'
         ];
         $with = [
-            'adType:id,name,features',
+         
             'category:id,name,slug',
             'user:id,name'
         ];
@@ -92,9 +85,6 @@ class PostController extends Controller
             })
             ->with($with)
             ->select($baseSelect)
-            ->orderByRaw('pinned_at IS NULL')
-            ->orderByDesc('pinned_at')
-            ->orderByDesc('featured_rank')
             ->latest('created_at')
             ->paginate(12, ['*'], 'paid_page')
             ->withQueryString();
@@ -567,7 +557,7 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         $post->update([
             'is_featured' => true,
-            'featured_until' => now()->addDays(90), // 3 أشهر = 90 يوم
+            'featured_until' => now()->addMonths(3), // 3 أشهر من لحظة التفعيل
         ]);
 
         return redirect()->route('the_posts.show', $post->id)->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');

@@ -83,7 +83,10 @@ class PaymentController extends Controller
 
                 // تحديث الإعلان إذا كان مرتبطاً
                 if ($payment->payable instanceof \App\Models\Post) {
-                    $payment->payable->update(['is_featured' => true]);
+                    $payment->payable->update([
+                        'is_featured' => true,
+                        'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
+                    ]);
                 }
 
                 return response()->json([
@@ -129,7 +132,10 @@ class PaymentController extends Controller
             if ($result) {
                 // تحديث حالة الإعلان إلى مميز
                 if ($payment->payable instanceof \App\Models\Post) {
-                    $payment->payable->update(['is_featured' => true]);
+                    $payment->payable->update([
+                        'is_featured' => true,
+                        'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
+                    ]);
                 }
 
                 return redirect()->route('the_posts.show', $payment->payable->id)
@@ -218,7 +224,10 @@ class PaymentController extends Controller
 
                 // تحديث الإعلان إذا كان مرتبطاً
                 if ($payment->payable instanceof \App\Models\Post) {
-                    $payment->payable->update(['is_featured' => true]);
+                    $payment->payable->update([
+                        'is_featured' => true,
+                        'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
+                    ]);
                 }
 
                 return response()->json([

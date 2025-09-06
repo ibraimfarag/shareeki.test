@@ -77,65 +77,6 @@ class PostEnumController extends Controller
         return view('admin.posts.enum.most_reported', ['name' => 'mostReported']);
     }
 
-    // Get Featured (Paid) Posts
-public function featured(Request $request)
-{
-    if ($request->ajax()) {
-
-        $posts = Post::query()
-            ->where('blacklist', 0)
-            ->where('is_paid', true)
-            ->where('status', 'active')
-            ->where(function ($q) {
-                $q->whereNull('ends_at')
-                  ->orWhere('ends_at', '>=', now());
-            })
-            // ->whereNotNull('pinned_at')
-            // ->whereJsonContains('features->badge', true)
-            ->withCount(['likes', 'dislikes', 'reports'])
-            ->with(['user:id,name'])
-            ->orderByRaw('pinned_at IS NULL')   
-            ->orderByDesc('pinned_at')
-            ->orderByDesc('featured_rank')
-            ->latest('created_at')
-            ->get();
-
-        return DataTables::of($posts)->addIndexColumn()
-            ->addColumn('show', function ($row) {
-                return '<a href="'.route("the_posts.show", [$row->slug]).'" target="_blank" class="btn btn-primary btn-sm">عرض</a>';
-            })
-            ->addColumn('blacklist', function ($row) {
-                if ($row->blacklist == 0) {
-                    return '<a href="'.route("blacklist", [$row->slug,'Post']).'" class="btn btn-warning btn-sm">حظر</a>';
-                }
-                return '<a href="'.route("unblacklist", [$row->slug,'Post']).'" class="btn btn-warning btn-sm">فك الحظر</a>';
-            })
-            ->addColumn('delete', function ($row) {
-                return '<a href="'.route("posts.delete", [$row->slug]).'" class="btn btn-danger btn-sm">حذف</a>';
-            })
-            // أعمدة إضافية مفيدة للإدارة
-            ->addColumn('status_badge', function ($row) {
-                $expired = $row->ends_at && $row->ends_at->lt(now());
-                if ($expired || $row->status !== 'active') {
-                    return '<span class="badge bg-danger">منتهي/غير فعّال</span>';
-                }
-                return '<span class="badge bg-success">فعّال</span>';
-            })
-            ->addColumn('type', function ($row) {
-                return $row->adType->name ?? 'paid';
-            })
-            ->addColumn('ends_in', function ($row) {
-                if (!$row->ends_at) return '-';
-                return e($row->ends_at->diffForHumans());
-            })
-            ->rawColumns(['show','blacklist','delete','status_badge'])
-            ->make(true);
-    }
-
-
-    return view('admin.posts.enum.featured', ['name' => 'featured']);
-}
-
 
     // Get Most Blacklisted Posts
     public function blackListed(Request $request)
