@@ -41,7 +41,7 @@ class SafeMigrate extends Command
 
             // تشغيل migrations مع تجاهل الأخطاء
             $this->info('تشغيل migrations...');
-            
+
             $exitCode = Artisan::call('migrate', [
                 '--force' => $this->option('force')
             ]);
@@ -61,11 +61,11 @@ class SafeMigrate extends Command
 
         } catch (\Exception $e) {
             $this->error('❌ حدث خطأ: ' . $e->getMessage());
-            
+
             // محاولة تشغيل migrations فردياً
             $this->info('محاولة تشغيل migrations فردياً...');
             $this->runMigrationsIndividually();
-            
+
             return 1;
         }
     }
@@ -76,16 +76,16 @@ class SafeMigrate extends Command
     private function runMigrationsIndividually()
     {
         $migrationFiles = glob(database_path('migrations/*.php'));
-        
+
         foreach ($migrationFiles as $file) {
             $filename = basename($file, '.php');
-            
+
             try {
                 // التحقق من أن migration لم يتم تشغيله من قبل
                 $exists = DB::table('migrations')
                     ->where('migration', $filename)
                     ->exists();
-                
+
                 if (!$exists) {
                     $this->info("تشغيل: {$filename}");
                     Artisan::call('migrate', [
@@ -96,7 +96,7 @@ class SafeMigrate extends Command
                 } else {
                     $this->line("⏭️ موجود بالفعل: {$filename}");
                 }
-                
+
             } catch (\Exception $e) {
                 $this->warn("⚠️ تم تجاهل: {$filename} - {$e->getMessage()}");
                 continue;
