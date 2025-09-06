@@ -352,7 +352,7 @@
 
     <!-- Paid Opportunities section -->
 
-    @if ($paidPosts->count() > 0)
+    {{-- @if ($paidPosts->count() > 0) --}}
         <!-- Section for large screens -->
         <section class="opportunities-block wrap fut-sec d-none d-lg-block" id="services">
             <div class="container">
@@ -453,7 +453,7 @@
                 </div>
             </div>
         </section>
-    @endif
+    {{-- @endif --}}
 
 
 
