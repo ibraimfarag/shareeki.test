@@ -473,7 +473,7 @@ class PostController extends Controller
         $headers = [
             'Content-type: application/json',
         ];
-        // استخدام الروابط الحقيقية مع التأكد من https
+        // استخدام الروابط الصحيحة التي تعمل على الموقع
         $baseUrl = 'https://shareeki.ibrahimahmed.online';
         $response_url = $baseUrl . "/payments/success?user_ref=" . urlencode(encrypt(auth()->id()));
         $error_url = $baseUrl . "/payments/error?user_ref=" . urlencode(encrypt(auth()->id()));
@@ -504,6 +504,11 @@ class PostController extends Controller
                 "langid" => "ar",
             ]
         ];
+        Log::info('Rajhi Payment Request', [
+            'tranData' => $tranData,
+            'response_url' => $response_url,
+            'error_url' => $error_url,
+        ]);
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => $basURL,
