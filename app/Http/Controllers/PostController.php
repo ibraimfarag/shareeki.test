@@ -471,9 +471,9 @@ class PostController extends Controller
         $headers = [
             'Content-type: application/json',
         ];
-        $baseUrl = config('app.url');
-        $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
-        $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
+    $baseUrl = 'https://shareeki.ibrahimahmed.online';
+    $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
+    $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
