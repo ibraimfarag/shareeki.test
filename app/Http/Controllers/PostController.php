@@ -513,7 +513,12 @@ class PostController extends Controller
         $err = curl_error($curl);
         curl_close($curl);
         if ($err) {
-            // تحديث السجل كفشل
+            \Log::error('Rajhi Payment CURL Error', [
+                'error' => $err,
+                'payment_id' => $payment->id,
+                'post_id' => $post->id,
+                'user_id' => auth()->id(),
+            ]);
             $payment->update(['status' => 'failed']);
             return back()->with('error', 'خطأ في الاتصال ببوابة الدفع');
         } else {
@@ -527,6 +532,13 @@ class PostController extends Controller
                 $url = 'https://digitalpayments.alrajhibank.com.sa/pg/paymentpage.htm?PaymentID=' . $payment_id;
                 return redirect()->to($url);
             } else {
+                \Log::error('Rajhi Payment Response Error', [
+                    'response' => $response,
+                    'decoded' => $result,
+                    'payment_id' => $payment->id,
+                    'post_id' => $post->id,
+                    'user_id' => auth()->id(),
+                ]);
                 $payment->update(['status' => 'failed']);
                 return back()->with('error', 'فشل إنشاء عملية الدفع');
             }
