@@ -77,8 +77,8 @@ Route::group(['prefix' => 'payments', 'middleware' => ['auth']], function () {
 
     // بوابة الراجحي للدفع
     Route::prefix('rajhi')->name('rajhi.')->group(function () {
-        Route::get('/success', [PaymentController::class, 'handleSuccess'])->name('success');
-        Route::get('/error', [PaymentController::class, 'handleError'])->name('error');
+        Route::match(['GET', 'POST'], '/success', [PaymentController::class, 'handleSuccess'])->name('success');
+        Route::match(['GET', 'POST'], '/error', [PaymentController::class, 'handleError'])->name('error');
         Route::post('/webhook', [PaymentController::class, 'handleWebhook'])->name('webhook');
         Route::get('/return', [PaymentController::class, 'handleReturn'])->name('return');
     });
