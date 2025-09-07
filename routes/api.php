@@ -17,11 +17,8 @@ use App\Http\Controllers\PageController;
 */
 
 Route::post('/payment', [PageController::class,'payment'])->name('Payment');
-Route::post('/success', [PageController::class,'success']);
-
-Route::post('/error', function(Request $request){
-    return view('payments.error');
-});
+Route::any('/success', [PageController::class,'success']);
+Route::any('/error', [PageController::class,'paymentError']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

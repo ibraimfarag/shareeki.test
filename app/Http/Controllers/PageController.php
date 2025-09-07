@@ -159,27 +159,37 @@ class PageController extends Controller
 
     public function success(Request $request)
     {
-        // فك تشفير الآي دي
+        $paymentId = $request->input('payment_id');
+        
+        // إذا كان هناك payment_id في الطلب، استخدمه
+        if ($paymentId) {
+            $payment = \App\Models\Payment::find($paymentId);
+            if ($payment) {
+                $payment->update(['status' => 'paid']);
+                
+                // تفعيل الإعلان المميز إذا كان الدفع متعلقًا بإعلان
+                if ($payment->payable_type === 'App\\Models\\Post') {
+                    $post = \App\Models\Post::find($payment->payable_id);
+                    if ($post) {
+                        $post->update([
+                            'is_featured' => true,
+                            'featured_until' => now()->addMonths(3),
+                        ]);
+                        
+                        return redirect()->route('the_posts.show', $post->id)
+                            ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
+                    }
+                }
+                
+                return redirect()->route('my_home')->with('success', 'تم الدفع بنجاح!');
+            }
+        }
+
+        // الكود القديم للتعامل مع العمولات
         try {
             $userId = decrypt($request->user_ref);
         } catch (\Exception $e) {
             return view('payments.success')->with('message', 'تم الدفع بنجاح (تعذر تحديد المستخدم)');
-        }
-
-        // تفعيل الإعلان المميز إذا كان الدفع متعلقًا بإعلان
-        $payment = \App\Models\Payment::where('user_id', $userId)
-            ->where('status', 'pending')
-            ->latest()
-            ->first();
-        if ($payment && $payment->payable_type === 'App\\Models\\Post') {
-            $post = \App\Models\Post::find($payment->payable_id);
-            if ($post) {
-                $post->update([
-                    'is_featured' => true,
-                    'featured_until' => now()->addMonths(3),
-                ]);
-            }
-            $payment->update(['status' => 'paid']);
         }
 
         // جلب آخر عملية دفع عمولة للمستخدم وهي معلقة
@@ -192,6 +202,30 @@ class PageController extends Controller
         }
         return view('payments.success');
     }
+    
+    public function paymentError(Request $request)
+    {
+        $paymentId = $request->input('payment_id');
+        
+        // إذا كان هناك payment_id في الطلب، استخدمه
+        if ($paymentId) {
+            $payment = \App\Models\Payment::find($paymentId);
+            if ($payment) {
+                $payment->update(['status' => 'failed']);
+                
+                if ($payment->payable_type === 'App\\Models\\Post') {
+                    $post = \App\Models\Post::find($payment->payable_id);
+                    if ($post) {
+                        return redirect()->route('the_posts.show', $post->id)
+                            ->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
+                    }
+                }
+            }
+        }
+        
+        return redirect()->route('my_home')->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
+    }
+
     public function error()
     {
         return view('payments.error');
