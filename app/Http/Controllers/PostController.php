@@ -451,7 +451,6 @@ class PostController extends Controller
     }
 
     public function featuredCheckout($id)
-
     {
 
         $post = Post::findOrFail($id);
@@ -475,8 +474,8 @@ class PostController extends Controller
             'Content-type: application/json',
         ];
         $baseUrl = config('app.url');
-        $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
-        $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
+        $response_url = preg_replace('/^http:/', 'https:', rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id())));
+        $error_url = preg_replace('/^http:/', 'https:', rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id())));
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
