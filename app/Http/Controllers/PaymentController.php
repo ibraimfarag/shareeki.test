@@ -120,7 +120,7 @@ class PaymentController extends Controller
         try {
             $paymentId = $request->input('payment_id'); // من الـ URL
             $trackId = $request->input('trackId'); // من استجابة الراجحي
-
+            
             Log::info('Payment Success Callback', [
                 'payment_id' => $paymentId,
                 'track_id' => $trackId,
@@ -147,7 +147,7 @@ class PaymentController extends Controller
                     'is_featured' => true,
                     'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
                 ]);
-
+                
                 Log::info('Post featured successfully', [
                     'post_id' => $payment->payable->id,
                     'payment_id' => $payment->id
@@ -159,7 +159,7 @@ class PaymentController extends Controller
 
             return redirect()->route('my_home')
                 ->with('success', 'تم الدفع بنجاح!');
-
+                
         } catch (\Exception $e) {
             Log::error('Payment Success Error', [
                 'error' => $e->getMessage(),
@@ -184,7 +184,7 @@ class PaymentController extends Controller
         if ($payment) {
             // تحديث حالة الدفع إلى فاشل
             $payment->update(['status' => 'failed']);
-
+            
             if ($payment->payable instanceof \App\Models\Post) {
                 return redirect()->route('the_posts.show', $payment->payable->id)
                     ->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
