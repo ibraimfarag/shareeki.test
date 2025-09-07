@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 // use App\Models\Tag;
 use Spatie\Tags\Tag;
 use Illuminate\support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use DB;
 
@@ -450,7 +451,9 @@ class PostController extends Controller
     }
 
     public function featuredCheckout($id)
+
     {
+
         $post = Post::findOrFail($id);
 
         // إنشاء دفعة جديدة للإعلان المميز
@@ -471,9 +474,9 @@ class PostController extends Controller
         $headers = [
             'Content-type: application/json',
         ];
-    $baseUrl = 'https://shareeki.ibrahimahmed.online';
-    $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
-    $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
+        $baseUrl = config('app.url');
+        $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
+        $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
@@ -535,6 +538,8 @@ class PostController extends Controller
                 \Log::error('Rajhi Payment Response Error', [
                     'response' => $response,
                     'decoded' => $result,
+                    'response_url' => $response_url,
+                    'error_url' => $error_url,
                     'payment_id' => $payment->id,
                     'post_id' => $post->id,
                     'user_id' => auth()->id(),
