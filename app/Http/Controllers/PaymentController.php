@@ -118,36 +118,53 @@ class PaymentController extends Controller
     public function handleSuccess(Request $request)
     {
         try {
-            $trackId = $request->input('trackId');
-            $paymentId = $request->input('udf1'); // استرجاع معرف الدفع من البيانات المخصصة
+            $paymentId = $request->input('payment_id'); // من الـ URL
+            $trackId = $request->input('trackId'); // من استجابة الراجحي
+            
+            Log::info('Payment Success Callback', [
+                'payment_id' => $paymentId,
+                'track_id' => $trackId,
+                'all_params' => $request->all()
+            ]);
 
             // البحث عن عملية الدفع
             $payment = Payment::find($paymentId);
             if (!$payment) {
-                throw new \Exception('Payment not found');
+                Log::error('Payment not found', ['payment_id' => $paymentId]);
+                return redirect()->route('my_home')
+                    ->with('error', 'لم يتم العثور على عملية الدفع');
             }
 
-            $result = $this->rajhiService->verifyPayment($trackId, $request->all());
+            // تحديث حالة الدفع إلى مكتمل
+            $payment->update([
+                'status' => 'paid',
+                'gateway_reference' => $trackId
+            ]);
 
-            if ($result) {
-                // تحديث حالة الإعلان إلى مميز
-                if ($payment->payable instanceof \App\Models\Post) {
-                    $payment->payable->update([
-                        'is_featured' => true,
-                        'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
-                    ]);
-                }
+            // تحديث حالة الإعلان إلى مميز
+            if ($payment->payable instanceof \App\Models\Post) {
+                $payment->payable->update([
+                    'is_featured' => true,
+                    'featured_until' => now()->addMonths(3) // 3 أشهر من لحظة نجاح الدفع
+                ]);
+                
+                Log::info('Post featured successfully', [
+                    'post_id' => $payment->payable->id,
+                    'payment_id' => $payment->id
+                ]);
 
                 return redirect()->route('the_posts.show', $payment->payable->id)
-                    ->with('success', 'تم تمييز الإعلان بنجاح!');
+                    ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
             }
 
-            return redirect()->route('the_posts.show', $payment->payable->id)
-                ->with('error', 'فشلت عملية الدفع');
+            return redirect()->route('my_home')
+                ->with('success', 'تم الدفع بنجاح!');
+                
         } catch (\Exception $e) {
             Log::error('Payment Success Error', [
                 'error' => $e->getMessage(),
-                'request' => $request->all()
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
             ]);
             return redirect()->route('my_home')
                 ->with('error', 'حدث خطأ أثناء معالجة عملية الدفع');
@@ -156,18 +173,26 @@ class PaymentController extends Controller
 
     public function handleError(Request $request)
     {
-        $paymentId = $request->input('udf1');
+        $paymentId = $request->input('payment_id');
         $payment = Payment::find($paymentId);
 
-        Log::error('Payment Error', $request->all());
+        Log::error('Payment Error', [
+            'payment_id' => $paymentId,
+            'all_params' => $request->all()
+        ]);
 
-        if ($payment && $payment->payable) {
-            return redirect()->route('the_posts.show', $payment->payable->id)
-                ->with('error', 'فشلت عملية الدفع');
+        if ($payment) {
+            // تحديث حالة الدفع إلى فاشل
+            $payment->update(['status' => 'failed']);
+            
+            if ($payment->payable instanceof \App\Models\Post) {
+                return redirect()->route('the_posts.show', $payment->payable->id)
+                    ->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
+            }
         }
 
         return redirect()->route('my_home')
-            ->with('error', 'فشلت عملية الدفع');
+            ->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
     }
 
     public function handleWebhook(Request $request)
