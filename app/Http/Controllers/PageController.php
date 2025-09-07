@@ -176,12 +176,16 @@ class PageController extends Controller
                             'featured_until' => now()->addMonths(3),
                         ]);
                         
-                        return redirect()->route('the_posts.show', $post->id)
-                            ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
+                        // عرض صفحة النجاح مع رابط للإعلان
+                        return view('payments.success')->with([
+                            'message' => 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!',
+                            'post_url' => route('the_posts.show', $post->id),
+                            'post_title' => $post->title
+                        ]);
                     }
                 }
                 
-                return redirect()->route('my_home')->with('success', 'تم الدفع بنجاح!');
+                return view('payments.success')->with('message', 'تم الدفع بنجاح!');
             }
         }
 
