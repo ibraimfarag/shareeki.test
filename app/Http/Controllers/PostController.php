@@ -473,9 +473,10 @@ class PostController extends Controller
         $headers = [
             'Content-type: application/json',
         ];
-        $baseUrl = config('app.url');
-        $response_url = preg_replace('/^http:/', 'https:', rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id())));
-        $error_url = preg_replace('/^http:/', 'https:', rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id())));
+        // استخدام الروابط الحقيقية مع التأكد من https
+        $baseUrl = 'https://shareeki.ibrahimahmed.online';
+        $response_url = $baseUrl . "/payments/success?user_ref=" . urlencode(encrypt(auth()->id()));
+        $error_url = $baseUrl . "/payments/error?user_ref=" . urlencode(encrypt(auth()->id()));
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
