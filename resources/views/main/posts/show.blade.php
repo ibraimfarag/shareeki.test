@@ -128,7 +128,9 @@
                      <i class="fa fa-star"></i>
                      إعلان مميز
                      @if($post->featured_until)
-                        <span class="text-muted ms-2">(ينتهي: {{ $post->featured_until->diffForHumans() }})</span>
+                        <span class="text-muted ms-2">
+                           (ينتهي بعد: {{ $post->featured_until->isFuture() ? $post->featured_until->diffInDays(now()) : 0 }} يوم)
+                        </span>
                      @endif
                   </div>
                @endif
@@ -482,26 +484,7 @@
                cancelButtonText: 'إلغاء'
             }).then((result) => {
                if (result.isConfirmed) {
-                  axios.post('/posts/{{ $post->id }}/feature')
-                     .then(function (response) {
-                        if (response.data.success) {
-                           if (response.data.redirect_url) {
-                              // تحويل المستخدم مباشرة إلى صفحة الدفع
-                              window.location.href = response.data.redirect_url;
-                           } else {
-                              Swal.fire('تم!', response.data.message, 'success')
-                                 .then(() => {
-                                    location.reload();
-                                 });
-                           }
-                        } else {
-                           Swal.fire('خطأ!', response.data.message, 'error');
-                        }
-                     })
-                     .catch(function (error) {
-                        console.error('Error:', error);
-                        Swal.fire('خطأ!', error.response?.data?.message || 'حدث خطأ أثناء معالجة طلبك', 'error');
-                     });
+                  window.location.href = '/posts/{{ $post->id }}/featured-checkout';
                }
             });
          @endauth

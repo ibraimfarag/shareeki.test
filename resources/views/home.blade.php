@@ -357,22 +357,32 @@
 
                                             {{-- شريط الأزرار --}}
                                             <div class="action-bar mt-3">
-                                                @if($canPromote)
-                                                    <button onclick="featurePost({{ $post->id }})"
-                                                        class="btn btn-promote btn-rounded">
-                                                        <i class="fa fa-bullhorn"></i>
-                                                        تمييز الإعلان
-                                                    </button>
-                                                @elseif(!$featuredService->canFeaturePost())
-                                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                        data-bs-placement="top"
-                                                        title="عذراً، جميع الأماكن المميزة محجوزة حالياً (الحد الأقصى 4 إعلانات)">
-                                                        <button class="btn btn-promote btn-rounded disabled-promote"
-                                                            style="pointer-events: none;" disabled>
+                                                @if($post->is_featured)
+                                                    <div class="featured-badge mb-2" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,193,7,0.15); color: #ffc107; padding: 0.4rem 1rem; border-radius: 999px; font-weight: 600; font-size: 15px;">
+                                                        <i class="fa fa-star"></i>
+                                                        إعلان مميز
+                                                        @if($post->featured_until)
+                                                            <span class="text-muted ms-2">متبقي: {{ $post->featured_until->isFuture() ? $post->featured_until->diffInDays(now()) : 0 }} يوم</span>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    @if($canPromote)
+                                                        <button onclick="featurePost({{ $post->id }})"
+                                                            class="btn btn-promote btn-rounded">
                                                             <i class="fa fa-bullhorn"></i>
                                                             تمييز الإعلان
                                                         </button>
-                                                    </span>
+                                                    @elseif(!$featuredService->canFeaturePost())
+                                                        <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="عذراً، جميع الأماكن المميزة محجوزة حالياً (الحد الأقصى 4 إعلانات)">
+                                                            <button class="btn btn-promote btn-rounded disabled-promote"
+                                                                style="pointer-events: none;" disabled>
+                                                                <i class="fa fa-bullhorn"></i>
+                                                                تمييز الإعلان
+                                                            </button>
+                                                        </span>
+                                                    @endif
                                                 @endif
 
                                                 <a href="{{ route('the_posts.edit', $post->id) }}"
@@ -532,17 +542,17 @@
             Swal.fire({
                 title: 'تأكيد تمييز الإعلان',
                 html: `
-                                <div class="text-right">
-                                    <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
-                                    <p>يشمل:</p>
-                                    <ul>
-                                        <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
-                                        <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
-                                    </ul>
-                                    <p>الفترة: من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</p>
-                                    <p>سيتم إصدار فاتورة وإيصال تلقائيًا.</p>
-                                </div>
-                            `,
+                        <div class="text-right">
+                            <p>تكلفة تمييز الإعلان: <strong>149.50</strong> ريال</p>
+                            <p>يشمل:</p>
+                            <ul>
+                                <li><strong>قيمة الإعلان:</strong> 130.00 ريال</li>
+                                <li><strong>ضريبة القيمة المضافة:</strong> 19.50 ريال</li>
+                            </ul>
+                            <p>الفترة: من {{ now()->format('Y-m-d') }} إلى {{ now()->addMonths(3)->format('Y-m-d') }}</p>
+                            <p>سيتم إصدار فاتورة وإيصال تلقائيًا.</p>
+                        </div>
+                    `,
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -551,25 +561,7 @@
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post(`/posts/${postId}/feature`)
-                        .then(function (response) {
-                            if (response.data.success) {
-                                if (response.data.redirect_url) {
-                                    window.location.href = response.data.redirect_url;
-                                } else {
-                                    Swal.fire('تم!', response.data.message, 'success')
-                                        .then(() => {
-                                            location.reload();
-                                        });
-                                }
-                            } else {
-                                Swal.fire('خطأ!', response.data.message, 'error');
-                            }
-                        })
-                        .catch(function (error) {
-                            console.error('Error:', error);
-                            Swal.fire('خطأ!', error.response?.data?.message || 'حدث خطأ أثناء معالجة طلبك', 'error');
-                        });
+                    window.location.href = `/posts/${postId}/featured-checkout`;
                 }
             });
         }
