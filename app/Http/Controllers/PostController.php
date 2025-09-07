@@ -61,7 +61,7 @@ class PostController extends Controller
             'code',
             'user_id',
             'category_id',
-        
+
             'title',
             'slug',
             'img',
@@ -69,7 +69,7 @@ class PostController extends Controller
             'created_at'
         ];
         $with = [
-         
+
             'category:id,name,slug',
             'user:id,name'
         ];
@@ -441,7 +441,7 @@ class PostController extends Controller
     }
 
 
-  
+
 
     public function showFeaturedOffer($id)
     {
@@ -466,8 +466,71 @@ class PostController extends Controller
             'payable_id' => $post->id,
         ]);
 
-        // توجيه المستخدم لصفحة الدفع
-        return redirect()->route('payments.checkout', $payment->id);
+        // إرسال بيانات الدفع إلى بوابة الراجحي
+        $basURL = "https://digitalpayments.alrajhibank.com.sa/pg/payment/hosted.htm";
+        $headers = [
+            'Content-type: application/json',
+        ];
+        $baseUrl = config('app.url');
+        $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode(encrypt(auth()->id()));
+        $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode(encrypt(auth()->id()));
+        $trackId = uniqid();
+        $amount = round($payment->amount, 1);
+        $obj = [
+            [
+                "amt" => $amount,
+                "action" => "1",
+                "password" => 'kf6CJ@R12@V7f!i',
+                "id" => '2iZubJ0EJ9l00Ko',
+                "currencyCode" => "682",
+                "trackId" => "$trackId",
+                "responseURL" => $response_url,
+                "errorURL" => $error_url,
+                "langid" => "ar",
+            ]
+        ];
+        $order = json_encode($obj);
+        // استخدم نفس دوال التشفير الموجودة في PageController
+        $code = app(\App\Http\Controllers\PageController::class)->encryption($order, '20204458918420204458918420204458');
+        $tranData = [
+            [
+                "id" => '2iZubJ0EJ9l00Ko',
+                "trandata" => $code,
+                "responseURL" => $response_url,
+                "errorURL" => $error_url,
+                "langid" => "ar",
+            ]
+        ];
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $basURL,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode($tranData),
+            CURLOPT_HTTPHEADER => $headers,
+        ]);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        if ($err) {
+            // تحديث السجل كفشل
+            $payment->update(['status' => 'failed']);
+            return back()->with('error', 'خطأ في الاتصال ببوابة الدفع');
+        } else {
+            $result = json_decode($response, true);
+            if (isset($result[0]['status']) && $result[0]['status'] == '1') {
+                $payment_id = substr($result[0]['result'], 0, 18);
+                $payment->update([
+                    'gateway_order_id' => $payment_id,
+                    'status' => 'pending',
+                ]);
+                $url = 'https://digitalpayments.alrajhibank.com.sa/pg/paymentpage.htm?PaymentID=' . $payment_id;
+                return redirect()->to($url);
+            } else {
+                $payment->update(['status' => 'failed']);
+                return back()->with('error', 'فشل إنشاء عملية الدفع');
+            }
+        }
     }
 
     public function confirmFeatured($id)

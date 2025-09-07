@@ -165,6 +165,23 @@ class PageController extends Controller
         } catch (\Exception $e) {
             return view('payments.success')->with('message', 'تم الدفع بنجاح (تعذر تحديد المستخدم)');
         }
+
+        // تفعيل الإعلان المميز إذا كان الدفع متعلقًا بإعلان
+        $payment = \App\Models\Payment::where('user_id', $userId)
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+        if ($payment && $payment->payable_type === 'App\\Models\\Post') {
+            $post = \App\Models\Post::find($payment->payable_id);
+            if ($post) {
+                $post->update([
+                    'is_featured' => true,
+                    'featured_until' => now()->addMonths(3),
+                ]);
+            }
+            $payment->update(['status' => 'paid']);
+        }
+
         // جلب آخر عملية دفع عمولة للمستخدم وهي معلقة
         $commissionPayment = \App\Models\CommissionPayment::where('user_id', $userId)
             ->where('status', 'pending')
