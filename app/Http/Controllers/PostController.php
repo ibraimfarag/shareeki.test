@@ -475,8 +475,8 @@ class PostController extends Controller
         ];
         // استخدام الروابط الصحيحة التي تعمل على الموقع
         $baseUrl = 'https://shareeki.ibrahimahmed.online';
-        $response_url = $baseUrl . "/payments/success?user_ref=" . urlencode(encrypt(auth()->id()));
-        $error_url = $baseUrl . "/payments/error?user_ref=" . urlencode(encrypt(auth()->id()));
+        $response_url = $baseUrl . "/payments/success";
+        $error_url = $baseUrl . "/payments/error";
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
@@ -515,6 +515,9 @@ class PostController extends Controller
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => json_encode($tranData),
             CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
         ]);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
