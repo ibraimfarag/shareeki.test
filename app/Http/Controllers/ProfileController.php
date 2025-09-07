@@ -39,6 +39,8 @@ class ProfileController extends Controller
         // تحديث رقم الجوال في الحقل الصحيح
         if ($newPhone) {
             $data['phone'] = $newPhone;
+            // إذا تم تغيير رقم الجوال، حدث تاريخ التحقق
+            $data['phone_verified_at'] = now();
         }
         unset($data['phone_full']);
         $user->update($data);

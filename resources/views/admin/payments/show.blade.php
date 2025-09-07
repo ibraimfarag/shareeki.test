@@ -49,7 +49,7 @@
                                         @if($payment->payable_type === 'App\Models\Post')
                                             إعلان مميز
                                             @if($payment->payable)
-                                                <a href="{{ asset('admin/posts/' . $payment->payable->id) }}" class="btn btn-link">
+                                                <a href="{{ route('posts.show', $payment->payable->slug) }}" class="btn btn-link">
                                                     عرض الإعلان
                                                 </a>
                                             @endif
