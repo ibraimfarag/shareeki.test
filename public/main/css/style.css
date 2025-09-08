@@ -2013,19 +2013,21 @@ img {
 
 .margin-right-ads {
   margin-right: 40px;
+  width: 28vw;
 }
 
-.img-ad{
-      width: 40vh;
-    object-fit: cover;
-    height: 15vh;
+.img-ad {
+  width: 40vh;
+  object-fit: cover;
+  height: 15vh;
 
 }
 
-.ad-h{
-      height: 35vh;
+.ad-h {
+  height: 35vh;
 
 }
+
 @media (max-width: 676px) {
 
 
@@ -2033,10 +2035,11 @@ img {
     height: 43vh;
     top: -26px;
   }
-.free-space {
-  height: 30vh;
- 
-}
+
+  .free-space {
+    height: 30vh;
+
+  }
 
 
 }

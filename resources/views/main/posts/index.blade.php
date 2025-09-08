@@ -17,7 +17,7 @@
         }
 
         .card.box-shadow-medium.border-radius-medium.card-hover {
-            padding: 1.5rem;
+            padding: 1rem  0.5rem;
             line-height: 1.6;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
