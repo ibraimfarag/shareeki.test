@@ -487,8 +487,9 @@ class PostController extends Controller
         $headers = [
             'Content-type: application/json',
         ];
-        $response_url = "https://shareeki.ibrahimahmed.online/api/success?payment_id=" . $payment->id;
-        $error_url = "https://shareeki.ibrahimahmed.online/api/error?payment_id=" . $payment->id;
+        $baseUrl = url('/');
+        $response_url = $baseUrl . "/api/success?payment_id=" . $payment->id;
+        $error_url = $baseUrl . "/api/error?payment_id=" . $payment->id;
         $trackId = uniqid();
         $amount = round($payment->amount, 1);
         $obj = [
