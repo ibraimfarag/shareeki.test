@@ -405,10 +405,19 @@
 
     <!-- Section for mobile screens -->
     <section class="opportunities-block wrap fut-sec d-block d-lg-none" id="services-mobile" style="margin-bottom: 0.5rem;">
-        <div class="container" style="padding: 0.2rem 0;">
+    <div class="container" style="padding: 0.2rem 0;">
             <h2 class="h2 text-dark-heading text-center mb-1" style="font-size: 1rem; font-weight: bold; color: #007bff;">
                 الفرص المميزة</h2>
-            <div class="swiper-container">
+            <div class="swiper-container" style="overflow: hidden; min-height: 270px;">
+        <style>
+            @media (max-width: 576px) {
+                #services-mobile .swiper-container {
+                    overflow: hidden;
+                    min-height: 270px;
+                    touch-action: pan-x;
+                }
+            }
+        </style>
                 <div class="swiper-wrapper">
                     <!-- card -->
                     @foreach ($paidPosts as $paidPost)
@@ -519,13 +528,23 @@
     <div class="container deletePagination mar-18">
         <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation example">
-                <ul class="pagination">
+                <ul class="pagination pagination-sm" style="max-width: 100%; overflow-x: auto;">
                     {{ $posts->links('pagination::bootstrap-4') }}
-
-
                 </ul>
             </nav>
         </div>
+        <style>
+            @media (max-width: 576px) {
+                .deletePagination {
+                    max-width: 340px;
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+                .pagination {
+                    font-size: 0.85rem;
+                }
+            }
+        </style>
     </div>
     <!--  -->
 @endsection
