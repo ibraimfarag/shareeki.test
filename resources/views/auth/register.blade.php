@@ -96,11 +96,11 @@
                         <input type="hidden" name="country_code">
                         <div class="mb-3" style="position: relative;">
                            <label for="phone" class="form-label">رقم الجوال</label>
-                           <div class="input-group flex-nowrap">
+                           <div class="input-group flex-column flex-md-row flex-nowrap gap-2">
                               <input id="phone" name="phone" type="tel"
                                  class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}"
                                  required autocomplete="tel" dir="ltr" style="text-align:left;" maxlength="12">
-                              <button type="button" class="btn btn-outline-primary" id="send-code-btn">إرسال كود
+                              <button type="button" class="btn btn-outline-primary mt-2 mt-md-0" id="send-code-btn">إرسال كود
                                  التفعيل</button>
                            </div>
                            @error('phone')

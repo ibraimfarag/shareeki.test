@@ -385,14 +385,16 @@
 
                 @for ($i = $paidPosts->count(); $i < 4; $i++)
                     <div class="mt-2">
-                        <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space ad-h">
-                            <div class="card-body text-center">
-                                <h4 class="h4 card-title text-dark-heading mb-2">اغتنم الفرصة الآن!</h4>
-                                <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
-                                    الشركاء المناسبين😎🤝
-                                </p>
+                        <a href="{{ route('the_posts.create') }}">
+                            <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space ad-h">
+                                <div class="card-body text-center">
+                                    <h4 class="h4 card-title text-dark-heading mb-2">اغتنم الفرصة الآن!</h4>
+                                    <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
+                                        الشركاء المناسبين😎🤝
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 @endfor
             </div>
@@ -436,15 +438,18 @@
 
                     @for ($i = $paidPosts->count(); $i < 4; $i++)
                         <div class="swiper-slide">
-                            <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space"
-                                style="max-width: 70%; margin: 0 auto;">
-                                <div class="card-body text-center">
-                                    <h4 class="h4 card-title text-dark-heading mb-1">اغتنم الفرصة الآن!</h4>
-                                    <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
-                                        الشركاء المناسبين😎🤝
-                                    </p>
+                            <a href="{{ route('the_posts.create') }}">
+                                <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space"
+                                    style="max-width: 70%; margin: 0 auto;">
+                                    <div class="card-body text-center">
+                                        <h4 class="h4 card-title text-dark-heading mb-1">اغتنم الفرصة الآن!</h4>
+                                        <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور
+                                            على
+                                            الشركاء المناسبين😎🤝
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     @endfor
                 </div>
@@ -609,7 +614,7 @@
             };
 
             @auth
-                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -620,12 +625,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                  <p class="h4">
-                                  لا توجد اي معلومات مطابقة
-                                  </p>
-                               </div>
-                                </div>`);
+                                    <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                      <p class="h4">
+                                      لا توجد اي معلومات مطابقة
+                                      </p>
+                                   </div>
+                                    </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
