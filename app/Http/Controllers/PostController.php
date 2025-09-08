@@ -195,8 +195,22 @@ class PostController extends Controller
             $request->merge(['img' => Upload::uploadImage($request->main_image, 'posts', $request->title)]);
 
 
-        // Prepare All Request Input Either For Entering DB Or For Other Process Depending On Other Model
-        $request->merge(['code' => rand(10, 50000), 'user_id' => auth()->user()->id, 'slug' => Str::slug($request->title), 'tags' => explode(',', $request->the_tags), 'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT)]);
+        // تجهيز رقم الجوال مع علامة + إذا كان يبدأ بمفتاح دولة
+        $userPhone = auth()->user()->phone ?? '';
+        if ($userPhone && preg_match('/^(966|20|971|973|974|968|965|962|961|218|212|216|218|249|963|970|972)/', $userPhone)) {
+            if (strpos($userPhone, '+') !== 0) {
+                $userPhone = '+' . $userPhone;
+            }
+        }
+        // الهاتف يؤخذ من حساب المستخدم وليس من النموذج، لذلك لا داعي لجعله required في الفاليديشن
+        $request->merge([
+            'code' => rand(10, 50000),
+            'user_id' => auth()->user()->id,
+            'slug' => Str::slug($request->title),
+            'tags' => explode(',', $request->the_tags),
+            'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT),
+            'phone' => $userPhone
+        ]);
 
         // Create Post
         $the_post = Post::create($request->except('_token', 'visible', 'main_image', 'the_attachment', 'tags', 'the_tags', 'full_partnership', 'loan', 'not_logged_in'));

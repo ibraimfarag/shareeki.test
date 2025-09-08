@@ -39,7 +39,7 @@ class PostFormRequest extends FormRequest
             'price' => 'required|numeric',
             'partners_no' => 'required|min:1|numeric',
             'body' => 'required',
-            'phone' => 'required|numeric',
+            // 'phone' => 'required|numeric',
             'the_attachment.*'     => 'required|file|mimes:xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff'
         ];
     }

@@ -330,12 +330,20 @@
                         @else
                         <div class="collapse" id="showNumber">
                            <div>
-                              {{-- <div class="personal-info--item mb-4">
+                              <div class="personal-info--item mb-4">
                                  <h4 class="h4 text-dark-heading">الجوال</h4>
-                                 <h5 class="h5 text-dark-content">
-                                    {{ $post->phone }}
+                                 <h5 class="h5 text-dark-content" style="direction:ltr; text-align:right;">
+                                    @php
+                                       $phone = $post->user->phone ?? '';
+                                       if ($phone && preg_match('/^(966|20|971|973|974|968|965|962|961|218|212|216|218|249|963|970|972)/', $phone)) {
+                                           if (strpos($phone, '+') !== 0) {
+                                               $phone = '+' . $phone;
+                                           }
+                                       }
+                                    @endphp
+                                    {{ $phone }}
                                  </h5>
-                              </div> --}}
+                              </div>
                               @if($post->email == 1)
                                  <div class="personal-info--item mb-4">
                                     <h4 class="h4 text-dark-heading">البريد الاكتروني</h4>

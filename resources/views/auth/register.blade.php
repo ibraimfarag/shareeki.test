@@ -41,6 +41,17 @@
                </div>
                <div class="border border-radius-medium p-5">
                   <h3 class="h3 text-dark-heading mb-3">تسجيل حساب جديد</h3>
+
+
+
+                  {{-- عرض رسائل النجاح --}}
+                  @if (session('success'))
+                     <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                  @endif
+
                   <div class="f">
                      <form method="POST" action="{{ route('register') }}" novalidate>
                         {{-- إضافة هذا السكربت لتحديث قيمة رقم الهاتف قبل الإرسال --}}
@@ -83,12 +94,12 @@
                         </div>
                         <input type="hidden" name="phone_full">
                         <input type="hidden" name="country_code">
-                        <div class="mb-3">
+                        <div class="mb-3" style="position: relative;">
                            <label for="phone" class="form-label">رقم الجوال</label>
                            <div class="input-group flex-nowrap">
                               <input id="phone" name="phone" type="tel"
                                  class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}"
-                                 required autocomplete="tel" dir="ltr" style="text-align:left;">
+                                 required autocomplete="tel" dir="ltr" style="text-align:left;" maxlength="12">
                               <button type="button" class="btn btn-outline-primary" id="send-code-btn">إرسال كود
                                  التفعيل</button>
                            </div>
@@ -98,18 +109,85 @@
                               </span>
                            @enderror
                            <span id="sms-status" class="text-success ms-2"></span>
+                           <div class="mt-2" style="position: absolute;top: 7vh;">
+                              <a href="#" id="show-otp-link"
+                                 style="font-size: 0.65rem;text-decoration: underline;color: #788cbf;cursor: pointer;">لدي
+                                 كود التفعيل</a>
+                           </div>
                         </div>
 
-                        <div class="form-floating mb-3" id="code-section" style="display:none;">
-                           <input id="phone_code" type="text"
-                              class="form-control @error('phone_code') is-invalid @enderror" name="phone_code"
-                              maxlength="4" pattern="[0-9]{4}" autocomplete="off">
-                           <label for="phone_code">كود التفعيل</label>
+                        <div class="mb-3" id="code-section"
+                           style="display:{{ $errors->has('phone_code') || old('phone_code') ? 'block' : 'none' }};">
+                           <label class="form-label mb-2" for="otp-input-1">كود التفعيل</label>
+                           <div class="d-flex gap-2 justify-content-center" style="direction: ltr;">
+                              <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                                 class="otp-input form-control text-center" id="otp-input-1" autocomplete="off"
+                                 style="width:50px; font-size:1.5rem;" />
+                              <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                                 class="otp-input form-control text-center" id="otp-input-2" autocomplete="off"
+                                 style="width:50px; font-size:1.5rem;" />
+                              <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                                 class="otp-input form-control text-center" id="otp-input-3" autocomplete="off"
+                                 style="width:50px; font-size:1.5rem;" />
+                              <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                                 class="otp-input form-control text-center" id="otp-input-4" autocomplete="off"
+                                 style="width:50px; font-size:1.5rem;" />
+                           </div>
+                           <input type="hidden" name="phone_code" id="phone_code" value="{{ old('phone_code') }}" />
                            @error('phone_code')
-                              <span class="invalid-feedback" role="alert">
+                              <span class="invalid-feedback d-block text-center mt-2" role="alert">
                                  <strong>{{ $message }}</strong>
                               </span>
                            @enderror
+                           <small class="form-text text-muted d-block text-center mt-2">أدخل الرمز المكون من 4 أرقام
+                              المرسل إلى جوالك</small>
+                           <script>
+                              document.addEventListener('DOMContentLoaded', function () {
+                                 // زر "لدي كود التفعيل" يظهر فقط إذا كان code-section مخفي
+                                 var showOtpLink = document.getElementById('show-otp-link');
+                                 var codeSection = document.getElementById('code-section');
+                                 if (showOtpLink && codeSection) {
+                                    // عند تحميل الصفحة: إذا كان code-section ظاهر، نخفي الرابط
+                                    if (codeSection.style.display === 'block') {
+                                       showOtpLink.style.display = 'none';
+                                    } else {
+                                       showOtpLink.style.display = '';
+                                    }
+                                    showOtpLink.addEventListener('click', function (e) {
+                                       e.preventDefault();
+                                       codeSection.style.display = 'block';
+                                       showOtpLink.style.display = 'none';
+                                       // تركيز على أول مربع OTP
+                                       var otpInput1 = document.getElementById('otp-input-1');
+                                       if (otpInput1) {
+                                          setTimeout(function () { otpInput1.focus(); }, 100);
+                                       }
+                                    });
+                                 }
+                                 const otpInputs = Array.from(document.querySelectorAll('.otp-input'));
+                                 const hiddenInput = document.getElementById('phone_code');
+                                 // إعادة ملء القيم القديمة إذا وجدت
+                                 if (hiddenInput.value && hiddenInput.value.length === 4) {
+                                    otpInputs.forEach((el, idx) => el.value = hiddenInput.value[idx] || '');
+                                 }
+                                 otpInputs.forEach((input, idx) => {
+                                    input.addEventListener('input', function (e) {
+                                       this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);
+                                       // الانتقال تلقائي للمربع التالي
+                                       if (this.value && idx < otpInputs.length - 1) {
+                                          otpInputs[idx + 1].focus();
+                                       }
+                                       // تحديث الحقل المخفي
+                                       hiddenInput.value = otpInputs.map(i => i.value).join('');
+                                    });
+                                    input.addEventListener('keydown', function (e) {
+                                       if (e.key === 'Backspace' && !this.value && idx > 0) {
+                                          otpInputs[idx - 1].focus();
+                                       }
+                                    });
+                                 });
+                              });
+                           </script>
                         </div>
 
 
@@ -191,7 +269,7 @@
                         </script>
                      </form>
 
-{{-- 
+                     {{--
                      <div class="border-top mt-4 pt-3">
                         <h3 class="h3 text-dark-heading mb-3 text-center mt-2">
                            أو التسجيل بواسطة
@@ -286,6 +364,12 @@
    </style>
    <script>
       const input = document.querySelector("#phone");
+      // تقييد الإدخال ليكون بحد أقصى 9 أرقام فقط
+      if (input) {
+         input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);
+         });
+      }
       const iti = window.intlTelInput(input, {
          loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.10.0/build/js/utils.js"),
          initialCountry: "sa",
@@ -340,15 +424,32 @@
             .then(res => {
                if (res.success) {
                   smsStatus.textContent = 'تم إرسال الكود بنجاح';
+                  smsStatus.classList.remove('text-danger');
+                  smsStatus.classList.add('text-success');
                   const codeSection = document.getElementById('code-section');
-                  if (codeSection) codeSection.style.display = '';
+                  const showOtpLink = document.getElementById('show-otp-link');
+                  if (codeSection) {
+                     codeSection.style.display = 'block';
+                     // إخفاء رابط "لدي كود التفعيل" إذا كان موجود
+                     if (showOtpLink) {
+                        showOtpLink.style.display = 'none';
+                     }
+                     // التركيز على حقل الكود
+                     const codeInput = document.getElementById('phone_code');
+                     if (codeInput) {
+                        setTimeout(() => codeInput.focus(), 100);
+                     }
+                  }
                } else {
                   smsStatus.textContent = res.message || 'حدث خطأ';
+                  smsStatus.classList.remove('text-success');
                   smsStatus.classList.add('text-danger');
                }
             })
-            .catch(() => {
-               smsStatus.textContent = 'حدث خطأ أثناء الإرسال';
+            .catch((error) => {
+               console.error('خطأ في إرسال SMS:', error);
+               smsStatus.textContent = 'حدث خطأ أثناء الإرسال - يرجى المحاولة مرة أخرى';
+               smsStatus.classList.remove('text-success');
                smsStatus.classList.add('text-danger');
             });
       });

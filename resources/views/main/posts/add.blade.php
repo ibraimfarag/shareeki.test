@@ -266,7 +266,17 @@
                               <label for="numPartnershipn" class="form-label">
                                  رقم الجوال للتواصل
                               </label>
-                              <input type="number" id="phone"  class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone', isset(session()->get('post')['phone']) ? session()->get('post')['phone'] : '') }}" required autocomplete="phone">
+                                        <div class="form-control-plaintext" style="font-size:1.1rem; color:#333; background:none; border:none; padding-left:0;">
+                                             @php
+                                                 $phone = auth()->user()->phone ?? '';
+                                                 if ($phone && preg_match('/^(966|20|971|973|974|968|965|962|961|218|212|216|218|249|963|970|972)/', $phone)) {
+                                                     if (strpos($phone, '+') !== 0) {
+                                                         $phone = '+' . $phone;
+                                                     }
+                                                 }
+                                             @endphp
+                                             <span style="direction:ltr; text-align:left; display:inline-block; min-width:120px;">{{ $phone }}</span>
+                                        </div>
                         
                                 @error('phone')
                                     <span class="invalid-feedback" role="alert">

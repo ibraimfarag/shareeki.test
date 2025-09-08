@@ -40,6 +40,20 @@ class RegisterController extends Controller
             'phone_code' => ['required', 'digits:4'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'check_terms' => ['required'],
+        ], [
+            'phone_code.required' => 'نأمل ادخال الرمز المرسل اليكم🙏🏽',
+            'phone_code.digits' => 'يجب أن يكون الرمز مكون من 4 أرقام',
+            'name.required' => 'اسم المستخدم مطلوب',
+            'email.required' => 'البريد الإلكتروني مطلوب',
+            'email.email' => 'البريد الإلكتروني غير صحيح',
+            'email.unique' => 'البريد الإلكتروني مستخدم بالفعل',
+            'phone_full.required' => 'رقم الجوال مطلوب',
+            'phone_full.regex' => 'رقم الجوال غير صحيح',
+            'phone_full.unique' => 'رقم الجوال مستخدم بالفعل',
+            'password.required' => 'كلمة المرور مطلوبة',
+            'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+            'password.confirmed' => 'تأكيد كلمة المرور غير متطابق',
+            'check_terms.required' => 'يجب الموافقة على الشروط والأحكام',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -54,7 +68,7 @@ class RegisterController extends Controller
                     'input_code' => $data['phone_code'],
                     'cache_code' => $code,
                 ]);
-                return redirect()->back()->withErrors(['phone_code' => 'كود التفعيل غير صحيح أو منتهي الصلاحية'])->withInput();
+                return redirect()->back()->withErrors(['phone_code' => 'نأمل ادخال الرمز المرسل اليكم🙏🏽 - الرمز غير صحيح أو منتهي الصلاحية'])->withInput();
             }
             \Log::info('كود التفعيل صحيح', ['phone' => $phone, 'code' => $code]);
             Cache::forget('phone_verification_' . $phone);
