@@ -49,5 +49,5 @@ class SearchController extends Controller
             'weeks_hours' => new WeeksHoursFilter,
             'the_tags' => new TagFilter,
         ];
-    }    
+    }
 }
