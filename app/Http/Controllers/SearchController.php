@@ -18,7 +18,10 @@ class SearchController extends Controller
     public function getFilters()
     {
         //dd(request()->all());
-        $posts = Post::filter($this->filters())->latest()->paginate(20);
+        $posts = Post::filter($this->filters())
+            ->with('category:id,name,slug,image')
+            ->latest()
+            ->paginate(20);
         /*foreach ($posts as $post) {
             $post->areaName = Post::getMainArea($post->area_id);
             $post->views = views($post)->unique()->count();

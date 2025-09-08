@@ -160,13 +160,13 @@ class PageController extends Controller
     public function success(Request $request)
     {
         $paymentId = $request->input('payment_id');
-        
+
         // إذا كان هناك payment_id في الطلب، استخدمه
         if ($paymentId) {
             $payment = \App\Models\Payment::find($paymentId);
             if ($payment) {
                 $payment->update(['status' => 'paid']);
-                
+
                 // تفعيل الإعلان المميز إذا كان الدفع متعلقًا بإعلان
                 if ($payment->payable_type === 'App\\Models\\Post') {
                     $post = \App\Models\Post::find($payment->payable_id);
@@ -175,7 +175,7 @@ class PageController extends Controller
                             'is_featured' => true,
                             'featured_until' => now()->addMonths(3),
                         ]);
-                        
+
                         // عرض صفحة النجاح مع رابط للإعلان
                         return view('payments.success')->with([
                             'message' => 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!',
@@ -184,7 +184,7 @@ class PageController extends Controller
                         ]);
                     }
                 }
-                
+
                 return view('payments.success')->with('message', 'تم الدفع بنجاح!');
             }
         }
@@ -206,17 +206,17 @@ class PageController extends Controller
         }
         return view('payments.success');
     }
-    
+
     public function paymentError(Request $request)
     {
         $paymentId = $request->input('payment_id');
-        
+
         // إذا كان هناك payment_id في الطلب، استخدمه
         if ($paymentId) {
             $payment = \App\Models\Payment::find($paymentId);
             if ($payment) {
                 $payment->update(['status' => 'failed']);
-                
+
                 if ($payment->payable_type === 'App\\Models\\Post') {
                     $post = \App\Models\Post::find($payment->payable_id);
                     if ($post) {
@@ -226,7 +226,7 @@ class PageController extends Controller
                 }
             }
         }
-        
+
         return redirect()->route('my_home')->with('error', 'فشلت عملية الدفع، يرجى المحاولة مرة أخرى');
     }
 

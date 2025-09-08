@@ -337,7 +337,7 @@
                                     for="skillsoption{{$category->id}}">
                                     <div class="d-flex align-items-center">
                                         <div class="sx-icon">
-                                            <img src="{{ asset('storage/main/categories/' . $category->image) }}" alt="">
+                                            <img src="{{ $category->img_path }}" alt="">
                                         </div>
                                         <h4 class="h4 card-text text-dark-content mb-0 ms-3">{{$category->name}}</h4>
                                     </div>
@@ -364,7 +364,7 @@
                             <a href="{{ route('the_posts.show', $paidPost->id) }}">
                                 <div class="card box-shadow-medium border-radius-medium card-hover ad-h">
                                     <img class="img-ad"
-                                        src="{{ $paidPost->img != null ? $paidPost->img_path : $paidPost->category->img_path ?? '' }}"
+                                        src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
                                         class="card-img-top" alt="...">
                                     <div class="card-body">
                                         <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
@@ -415,7 +415,7 @@
                                     style="max-width: 70%; margin: 0 auto;">
                                     <a href="{{ route('the_posts.show', $paidPost->id) }}">
                                         <img class="img-ad"
-                                            src="{{ $paidPost->img != null ? $paidPost->img_path : $paidPost->category->img_path ?? '' }}"
+                                            src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
                                             class="card-img-top" alt="...">
                                         <div class="card-body">
                                             <h4 class="h4 card-title text-dark-heading mb-1 line-clamp2">
@@ -469,7 +469,7 @@
 
                         <a href="{{ route('the_posts.show', $post->id) }}">
                             <div class="card box-shadow-medium border-radius-medium card-hover">
-                                <img src="{{ $post->img != null ? $post->img_path : $post->category->img_path ?? '' }}"
+                                <img src="{{ !empty($post->img) ? $post->img_path : ($post->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
                                     class="card-img-top" alt="...">
                                 <div class="card-body">
                                     <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">

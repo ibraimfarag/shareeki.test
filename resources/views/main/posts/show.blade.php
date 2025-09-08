@@ -153,7 +153,7 @@
          <div class="row">
             <div class="col-lg-8">
                <div class="product-image mb-3 border-radius-medium overflow-hidden">
-                  <img src="{{ $post->img != null ? $post->img_path : $post->category->img_path ?? '' }}"
+                  <img src="{{ !empty($post->img) ? $post->img_path : ($post->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
                      class="img-fluid" alt="...">
                </div>
 

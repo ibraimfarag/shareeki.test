@@ -71,7 +71,7 @@ class PostController extends Controller
         ];
         $with = [
 
-            'category:id,name,slug',
+            'category:id,name,slug,image',
             'user:id,name'
         ];
 
@@ -248,7 +248,7 @@ class PostController extends Controller
 
 
         //$the_post = Post::find($id);
-        $the_post = Post::where('id', $id)->orWhere('slug', $id)->first();
+        $the_post = Post::where('id', $id)->orWhere('slug', $id)->with('category:id,name,slug,image,category_id')->first();
         if (!isset($the_post->title)) {
             abort(404);
             return;
