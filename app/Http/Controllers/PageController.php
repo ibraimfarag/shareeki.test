@@ -279,8 +279,8 @@ class PageController extends Controller
             'Content-type: application/json',
         );
         $baseUrl = config('app.url');
-        $response_url = rtrim($baseUrl, '/') . "/api/commission-status";
-        $error_url = rtrim($baseUrl, '/') . "/api/commission-status";
+        $response_url = $baseUrl . "/api/commission-status";
+        $error_url = $baseUrl . "/api/commission-status";
         $pages = range(1, 1000000);
         shuffle($pages);
         $page = array_shift($pages);
