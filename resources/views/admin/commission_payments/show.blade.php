@@ -24,6 +24,8 @@
                             <span class="badge bg-success">ناجحة</span>
                         @elseif($payment->status == 'failed')
                             <span class="badge bg-danger">فاشلة</span>
+                        @elseif($payment->status == 'canceled')
+                            <span class="badge bg-danger">ملغاة</span>
                         @else
                             <span class="badge bg-warning text-dark">معلقة</span>
                         @endif
