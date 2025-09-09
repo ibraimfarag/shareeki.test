@@ -16,18 +16,40 @@ class PageController extends Controller
     {
         // جلب معرف دفعة العمولة من الـ URL
         $commissionPaymentId = $request->input('commission_payment_id');
-        
+
         if (!$commissionPaymentId) {
             return response()->json(['error' => 'Commission payment ID missing'], 400);
         }
 
-        $trandata = $request->input('trandata');
+        // جلب دفعة العمولة من قاعدة البيانات
+        $commissionPayment = CommissionPayment::find($commissionPaymentId);
 
-        if (!$trandata) {
-            return response()->json(['error' => 'trandata missing'], 400);
+        if (!$commissionPayment) {
+            return response()->json([
+                'error' => 'Commission payment record not found',
+                'commission_payment_id' => $commissionPaymentId
+            ], 404);
         }
 
-        // فك التشفير
+        $trandata = $request->input('trandata');
+
+        // إذا لم يكن هناك trandata (GET request من المتصفح)
+        if (!$trandata) {
+            // تسجيل المحاولة
+            \Log::info('Commission Payment webhook accessed without trandata', [
+                'commission_payment_id' => $commissionPaymentId,
+                'method' => $request->method(),
+                'all_inputs' => $request->all()
+            ]);
+
+            // عرض صفحة انتظار أو رسالة
+            return view('payments.success', [
+                'message' => 'تم استلام طلب دفع العمولة، يرجى انتظار تأكيد الدفع...',
+                'commission_payment' => $commissionPayment
+            ]);
+        }
+
+        // فك التشفير إذا كان هناك trandata
         $decrypted = $this->decryption($trandata, '20204458918420204458918420204458');
         $decoded = json_decode($decrypted, true);
 
@@ -39,17 +61,10 @@ class PageController extends Controller
         $data = $decoded[0] ?? [];
 
         // تسجيل البيانات للتشخيص
-        \Log::info('Commission Payment webhook received', ['commission_payment_id' => $commissionPaymentId, 'data' => $data]);
-
-        // جلب دفعة العمولة من قاعدة البيانات
-        $commissionPayment = CommissionPayment::find($commissionPaymentId);
-        
-        if (!$commissionPayment) {
-            return response()->json([
-                'error' => 'Commission payment record not found',
-                'commission_payment_id' => $commissionPaymentId
-            ], 404);
-        }
+        \Log::info('Commission Payment webhook received with trandata', [
+            'commission_payment_id' => $commissionPaymentId,
+            'data' => $data
+        ]);
 
         // تحديث payment_id إذا كان متوفراً في البيانات
         if (isset($data['paymentId'])) {
@@ -284,7 +299,7 @@ class PageController extends Controller
             'Content-type: application/json',
         );
         $baseUrl = config('app.url');
-        
+
         // سجل العملية في قاعدة البيانات كـ pending
         $commissionPayment = CommissionPayment::create([
             'user_id' => $userId,
@@ -293,11 +308,19 @@ class PageController extends Controller
             'status' => 'pending',
             'payment_id' => null,
         ]);
-        
+
         // إضافة معرف العملية إلى روابط الاستجابة
-        $response_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
-        $error_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
-        
+        // للاختبار: استخدم webhook.site لتجنب مشاكل HTTPS
+        $isTestMode = env('PAYMENT_TEST_MODE', false);
+        $webhookTestUrl = env('WEBHOOK_TEST_URL', 'https://webhook.site/713b3a98-4400-43b8-9cd4-ec3d8743bba2');
+
+        if ($isTestMode) {
+            $response_url = $webhookTestUrl . "?commission_payment_id=" . $commissionPayment->id;
+            $error_url = $webhookTestUrl . "?commission_payment_id=" . $commissionPayment->id;
+        } else {
+            $response_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
+            $error_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
+        }
         $pages = range(1, 1000000);
         shuffle($pages);
         $page = array_shift($pages);
