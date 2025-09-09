@@ -14,6 +14,13 @@ class PageController extends Controller
      */
     public function commissionPaymentWebhook(Request $request)
     {
+        // جلب معرف دفعة العمولة من الـ URL
+        $commissionPaymentId = $request->input('commission_payment_id');
+        
+        if (!$commissionPaymentId) {
+            return response()->json(['error' => 'Commission payment ID missing'], 400);
+        }
+
         $trandata = $request->input('trandata');
 
         if (!$trandata) {
@@ -32,67 +39,65 @@ class PageController extends Controller
         $data = $decoded[0] ?? [];
 
         // تسجيل البيانات للتشخيص
-        \Log::info('Commission Payment webhook received', ['data' => $data]);
+        \Log::info('Commission Payment webhook received', ['commission_payment_id' => $commissionPaymentId, 'data' => $data]);
 
-        // تحديث حالة دفع العمولة بناءً على البيانات المستقبلة
-        if (isset($data['paymentId'])) {
-            $commissionPayment = CommissionPayment::where('payment_id', $data['paymentId'])->first();
-
-            if ($commissionPayment) {
-                // تحديد حالة الدفع بناءً على النتيجة
-                if (isset($data['result'])) {
-                    if ($data['result'] == 'SUCCESS') {
-                        $commissionPayment->update(['status' => 'success']);
-                        return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
-
-                    } elseif ($data['result'] == 'CANCELED') {
-                        $commissionPayment->update(['status' => 'canceled']);
-                        return view('payments.error', ['message' => 'تم إلغاء عملية دفع العمولة']);
-
-                    } elseif ($data['result'] == 'NOT CAPTURED') {
-                        $commissionPayment->update(['status' => 'failed']);
-                        $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي أو البطاقة مرفوضة';
-                        if (isset($data['authRespCode']) && $data['authRespCode'] == '57') {
-                            $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي في البطاقة';
-                        }
-                        return view('payments.error', ['message' => $errorMessage]);
-
-                    } else {
-                        $commissionPayment->update(['status' => 'failed']);
-                        return view('payments.error', ['message' => 'حدث خطأ غير متوقع في دفع العمولة']);
-                    }
-
-                } elseif (isset($data['error']) && !empty($data['error'])) {
-                    $commissionPayment->update(['status' => 'failed']);
-
-                    $errorMessage = 'فشل دفع العمولة';
-                    if (isset($data['errorText'])) {
-                        if ($data['error'] == 'IPAY0100207') {
-                            $errorMessage = 'نوع البطاقة غير مدعوم لدفع العمولة - يرجى استخدام بطاقة أخرى';
-                        } elseif ($data['error'] == 'IPAY0100352') {
-                            $errorMessage = 'فشل في التحقق من البطاقة لدفع العمولة - يرجى التأكد من بيانات البطاقة';
-                        } else {
-                            $errorMessage = $data['errorText'];
-                        }
-                    }
-                    return view('payments.error', ['message' => $errorMessage]);
-
-                } else {
-                    // حالة افتراضية للنجاح
-                    $commissionPayment->update(['status' => 'success']);
-                    return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
-                }
-            } else {
-                return response()->json([
-                    'error' => 'Commission payment record not found',
-                    'paymentId' => $data['paymentId']
-                ], 404);
-            }
-        } else {
+        // جلب دفعة العمولة من قاعدة البيانات
+        $commissionPayment = CommissionPayment::find($commissionPaymentId);
+        
+        if (!$commissionPayment) {
             return response()->json([
-                'error' => 'Payment ID missing in commission webhook data',
-                'data' => $data
-            ], 400);
+                'error' => 'Commission payment record not found',
+                'commission_payment_id' => $commissionPaymentId
+            ], 404);
+        }
+
+        // تحديث payment_id إذا كان متوفراً في البيانات
+        if (isset($data['paymentId'])) {
+            $commissionPayment->update(['payment_id' => $data['paymentId']]);
+        }
+
+        // تحديد حالة الدفع بناءً على النتيجة
+        if (isset($data['result'])) {
+            if ($data['result'] == 'SUCCESS') {
+                $commissionPayment->update(['status' => 'success']);
+                return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
+
+            } elseif ($data['result'] == 'CANCELED') {
+                $commissionPayment->update(['status' => 'canceled']);
+                return view('payments.error', ['message' => 'تم إلغاء عملية دفع العمولة']);
+
+            } elseif ($data['result'] == 'NOT CAPTURED') {
+                $commissionPayment->update(['status' => 'failed']);
+                $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي أو البطاقة مرفوضة';
+                if (isset($data['authRespCode']) && $data['authRespCode'] == '57') {
+                    $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي في البطاقة';
+                }
+                return view('payments.error', ['message' => $errorMessage]);
+
+            } else {
+                $commissionPayment->update(['status' => 'failed']);
+                return view('payments.error', ['message' => 'حدث خطأ غير متوقع في دفع العمولة']);
+            }
+
+        } elseif (isset($data['error']) && !empty($data['error'])) {
+            $commissionPayment->update(['status' => 'failed']);
+
+            $errorMessage = 'فشل دفع العمولة';
+            if (isset($data['errorText'])) {
+                if ($data['error'] == 'IPAY0100207') {
+                    $errorMessage = 'نوع البطاقة غير مدعوم لدفع العمولة - يرجى استخدام بطاقة أخرى';
+                } elseif ($data['error'] == 'IPAY0100352') {
+                    $errorMessage = 'فشل في التحقق من البطاقة لدفع العمولة - يرجى التأكد من بيانات البطاقة';
+                } else {
+                    $errorMessage = $data['errorText'];
+                }
+            }
+            return view('payments.error', ['message' => $errorMessage]);
+
+        } else {
+            // حالة افتراضية للنجاح
+            $commissionPayment->update(['status' => 'success']);
+            return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
         }
     }
 
@@ -279,8 +284,20 @@ class PageController extends Controller
             'Content-type: application/json',
         );
         $baseUrl = config('app.url');
-        $response_url = $baseUrl . "/api/commission-status";
-        $error_url = $baseUrl . "/api/commission-status";
+        
+        // سجل العملية في قاعدة البيانات كـ pending
+        $commissionPayment = CommissionPayment::create([
+            'user_id' => $userId,
+            'amount' => $original_amount,
+            'commission' => $amount,
+            'status' => 'pending',
+            'payment_id' => null,
+        ]);
+        
+        // إضافة معرف العملية إلى روابط الاستجابة
+        $response_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
+        $error_url = $baseUrl . "/api/commission-status?commission_payment_id=" . $commissionPayment->id;
+        
         $pages = range(1, 1000000);
         shuffle($pages);
         $page = array_shift($pages);
@@ -310,14 +327,6 @@ class PageController extends Controller
                 "langid" => "ar",
             )
         );
-        // سجل العملية في قاعدة البيانات كـ pending
-        $commissionPayment = CommissionPayment::create([
-            'user_id' => $userId,
-            'amount' => $original_amount,
-            'commission' => $amount,
-            'status' => 'pending',
-            'payment_id' => null,
-        ]);
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $basURL,
