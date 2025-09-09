@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->decimal('amount', 12, 2);
             $table->decimal('commission', 12, 2);
-            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->enum('status', ['pending','success','failed','canceled'])->default('pending');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

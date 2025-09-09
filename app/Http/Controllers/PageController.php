@@ -10,6 +10,93 @@ use Illuminate\Http\Request;
 class PageController extends Controller
 {
     /**
+     * Webhook لاستقبال نتيجة دفع العمولة من بوابة الراجحي
+     */
+    public function commissionPaymentWebhook(Request $request)
+    {
+        $trandata = $request->input('trandata');
+
+        if (!$trandata) {
+            return response()->json(['error' => 'trandata missing'], 400);
+        }
+
+        // فك التشفير
+        $decrypted = $this->decryption($trandata, '20204458918420204458918420204458');
+        $decoded = json_decode($decrypted, true);
+
+        // التحقق من صحة البيانات المفكوكة
+        if (!$decoded || !is_array($decoded)) {
+            return response()->json(['error' => 'Invalid trandata format'], 400);
+        }
+
+        $data = $decoded[0] ?? [];
+
+        // تسجيل البيانات للتشخيص
+        \Log::info('Commission Payment webhook received', ['data' => $data]);
+
+        // تحديث حالة دفع العمولة بناءً على البيانات المستقبلة
+        if (isset($data['paymentId'])) {
+            $commissionPayment = CommissionPayment::where('payment_id', $data['paymentId'])->first();
+
+            if ($commissionPayment) {
+                // تحديد حالة الدفع بناءً على النتيجة
+                if (isset($data['result'])) {
+                    if ($data['result'] == 'SUCCESS') {
+                        $commissionPayment->update(['status' => 'success']);
+                        return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
+
+                    } elseif ($data['result'] == 'CANCELED') {
+                        $commissionPayment->update(['status' => 'canceled']);
+                        return view('payments.error', ['message' => 'تم إلغاء عملية دفع العمولة']);
+
+                    } elseif ($data['result'] == 'NOT CAPTURED') {
+                        $commissionPayment->update(['status' => 'failed']);
+                        $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي أو البطاقة مرفوضة';
+                        if (isset($data['authRespCode']) && $data['authRespCode'] == '57') {
+                            $errorMessage = 'فشل دفع العمولة - الرصيد غير كافي في البطاقة';
+                        }
+                        return view('payments.error', ['message' => $errorMessage]);
+
+                    } else {
+                        $commissionPayment->update(['status' => 'failed']);
+                        return view('payments.error', ['message' => 'حدث خطأ غير متوقع في دفع العمولة']);
+                    }
+
+                } elseif (isset($data['error']) && !empty($data['error'])) {
+                    $commissionPayment->update(['status' => 'failed']);
+
+                    $errorMessage = 'فشل دفع العمولة';
+                    if (isset($data['errorText'])) {
+                        if ($data['error'] == 'IPAY0100207') {
+                            $errorMessage = 'نوع البطاقة غير مدعوم لدفع العمولة - يرجى استخدام بطاقة أخرى';
+                        } elseif ($data['error'] == 'IPAY0100352') {
+                            $errorMessage = 'فشل في التحقق من البطاقة لدفع العمولة - يرجى التأكد من بيانات البطاقة';
+                        } else {
+                            $errorMessage = $data['errorText'];
+                        }
+                    }
+                    return view('payments.error', ['message' => $errorMessage]);
+
+                } else {
+                    // حالة افتراضية للنجاح
+                    $commissionPayment->update(['status' => 'success']);
+                    return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
+                }
+            } else {
+                return response()->json([
+                    'error' => 'Commission payment record not found',
+                    'paymentId' => $data['paymentId']
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'error' => 'Payment ID missing in commission webhook data',
+                'data' => $data
+            ], 400);
+        }
+    }
+
+    /**
      * Webhook لاستقبال نتيجة الدفع من بوابة الراجحي
      */
     public function paymentWebhook(Request $request)
@@ -192,8 +279,8 @@ class PageController extends Controller
             'Content-type: application/json',
         );
         $baseUrl = config('app.url');
-        $response_url = rtrim($baseUrl, '/') . "/api/success?user_ref=" . urlencode($request->secure_ref);
-        $error_url = rtrim($baseUrl, '/') . "/api/error?user_ref=" . urlencode($request->secure_ref);
+        $response_url = rtrim($baseUrl, '/') . "/api/commission-status";
+        $error_url = rtrim($baseUrl, '/') . "/api/commission-status";
         $pages = range(1, 1000000);
         shuffle($pages);
         $page = array_shift($pages);

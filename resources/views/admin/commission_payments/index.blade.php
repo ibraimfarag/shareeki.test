@@ -38,6 +38,8 @@
                                     <td>
                                         @if($payment->status == 'success')
                                             <span class="badge bg-success">ناجحة</span>
+                                        @elseif($payment->status == 'canceled')
+                                        <span class="badge bg-danger">ملغاة</span>
                                         @elseif($payment->status == 'failed')
                                             <span class="badge bg-danger">فاشلة</span>
                                         @else
