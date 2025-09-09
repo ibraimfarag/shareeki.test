@@ -16,10 +16,12 @@ use App\Http\Controllers\PageController;
 |
 */
 
+
 Route::post('/payment', [PageController::class, 'payment'])->name('Payment');
 Route::any('/success', [PageController::class, 'success']);
 Route::any('/error', [PageController::class, 'paymentError']);
-
+// Route::post('/webhook/payment', [PageController::class, 'paymentWebhook']);
+Route::post('/payment-status', [PageController::class, 'paymentWebhook']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -86,12 +86,15 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6">
                         <div class="content" data-sal="slide-up" data-sal-duration="800" data-sal-delay="400">
-                            <h2 class="title">{{ $message ?? 'تم الدفع بنجاح!' }}</h2>
+                            <h2 class="title">{{ $message ?? session('message') ?? 'تم الدفع بنجاح!' }}</h2>
 
-                            @if(isset($post_url) && isset($post_title))
-                                <p class="subtitle-2">تم تمييز إعلان "<strong>{{ $post_title }}</strong>" بنجاح</p>
+                            @if((isset($post_url) && isset($post_title)) || (session('post_url') && session('post_title')))
+                                <p class="subtitle-2">تم تمييز إعلان
+                                    "<strong>{{ $post_title ?? session('post_title') }}</strong>" بنجاح
+                                </p>
                                 <div class="d-flex gap-3 mt-4">
-                                    <a href="{{ $post_url }}" class="axil-btn btn-fill-primary">عرض الإعلان</a>
+                                    <a href="{{ $post_url ?? session('post_url') }}" class="axil-btn btn-fill-primary">عرض
+                                        الإعلان</a>
                                     <a href="/" class="axil-btn btn-outline-primary">العودة للرئيسية</a>
                                 </div>
                             @else

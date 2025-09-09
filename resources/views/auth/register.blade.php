@@ -100,7 +100,8 @@
                               <input id="phone" name="phone" type="tel"
                                  class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}"
                                  required autocomplete="tel" dir="ltr" style="text-align:left;" maxlength="12">
-                              <button type="button" class="btn btn-outline-primary mt-2 mt-md-0" id="send-code-btn">إرسال كود
+                              <button type="button" class="btn btn-outline-primary mt-2 mt-md-0"
+                                 id="send-code-btn">إرسال كود
                                  التفعيل</button>
                            </div>
                            @error('phone')

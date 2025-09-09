@@ -9,6 +9,146 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
+    /**
+     * Webhook لاستقبال نتيجة الدفع من بوابة الراجحي
+     */
+    public function paymentWebhook(Request $request)
+    {
+        $trandata = $request->input('trandata');
+
+        if (!$trandata) {
+            return response()->json(['error' => 'trandata missing'], 400);
+        }
+
+        // فك التشفير
+        $decrypted = $this->decryption($trandata, '20204458918420204458918420204458');
+        $decoded = json_decode($decrypted, true);
+
+        // التحقق من صحة البيانات المفكوكة
+        if (!$decoded || !is_array($decoded)) {
+            return response()->json(['error' => 'Invalid trandata format'], 400);
+        }
+
+        $data = $decoded[0] ?? [];
+
+        // تسجيل البيانات للتشخيص (يمكن إزالتها لاحقاً)
+        \Log::info('Payment webhook received', ['data' => $data]);
+
+        // dd([
+        //     'trandata' => $trandata,
+        //     'decrypted' => $decrypted,
+        //     'decoded' => $decoded,
+        //     'data' => $data
+        // ]);
+
+        // تحديث حالة الدفع بناءً على البيانات المستقبلة
+        if (isset($data['paymentId'])) {
+            // dd('Payment ID found', $data['paymentId']);
+            $payment = \App\Models\Payment::where('gateway_order_id', $data['paymentId'])->first();
+            if ($payment) {
+                // dd('Payment record found in database', $payment->toArray());
+
+                // تحديد حالة الدفع بناءً على النتيجة
+                if (isset($data['result'])) {
+                    // dd('Has result field', $data['result']);
+                    // الحالة الأولى: يوجد result (SUCCESS, CANCELED, NOT CAPTURED)
+
+                    if ($data['result'] == 'SUCCESS') {
+                        // dd('SUCCESS case - Payment successful', $data);
+                        $payment->update(['status' => 'paid']);
+
+                        // تفعيل الإعلان إذا كان الدفع متعلق بإعلان
+                        if ($payment->payable_type === 'App\\Models\\Post') {
+                            $post = \App\Models\Post::find($payment->payable_id);
+                            if ($post) {
+                                $post->update([
+                                    'is_featured' => true,
+                                    'featured_until' => now()->addMonths(3),
+                                ]);
+                                return redirect()->route('the_posts.show', $post->id)
+                                    ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
+                            }
+                        }
+                        return view('payments.success', ['message' => 'تم الدفع بنجاح!']);
+
+                    } elseif ($data['result'] == 'CANCELED') {
+                        // dd('CANCELED case - Payment canceled', $data,$payment->payable_type);
+                        $payment->update(['status' => 'canceled']);
+
+                        return view('payments.error', ['message' => 'تم إلغاء عملية الدفع']);
+                    } elseif ($data['result'] == 'NOT CAPTURED') {
+                        // dd('NOT CAPTURED case - Payment failed (insufficient funds)', $data);
+                        $payment->update(['status' => 'failed']);
+
+                        // رسالة مخصصة للرصيد غير الكافي
+                        $errorMessage = 'فشل الدفع - الرصيد غير كافي أو البطاقة مرفوضة';
+                        if (isset($data['authRespCode']) && $data['authRespCode'] == '57') {
+                            $errorMessage = 'فشل الدفع - الرصيد غير كافي في البطاقة';
+                        }
+
+
+                        return view('payments.error', ['message' => $errorMessage]);
+
+                    } else {
+                        // dd('UNKNOWN result case - Unknown payment result', $data);
+                        // حالة غير معروفة
+                        $payment->update(['status' => 'failed']);
+                        return view('payments.error', ['message' => 'حدث خطأ غير متوقع في عملية الدفع']);
+                    }
+
+                } elseif (isset($data['error']) && !empty($data['error'])) {
+                    // dd('ERROR case - Payment has error', $data);
+                    // الحالة الثانية: يوجد error (أخطاء مختلفة)
+                    $payment->update(['status' => 'failed']);
+
+                    // تحديد رسالة الخطأ بناءً على نوع الخطأ
+                    $errorMessage = 'فشل الدفع';
+                    if (isset($data['errorText'])) {
+                        if ($data['error'] == 'IPAY0100207') {
+                            $errorMessage = 'نوع البطاقة غير مدعوم - يرجى استخدام بطاقة أخرى';
+                        } elseif ($data['error'] == 'IPAY0100352') {
+                            $errorMessage = 'فشل في التحقق من البطاقة - يرجى التأكد من بيانات البطاقة';
+                        } else {
+                            $errorMessage = $data['errorText'];
+                        }
+                    }
+
+
+                    return view('payments.error', ['message' => $errorMessage]);
+
+                } else {
+                    // dd('NO RESULT NO ERROR case - Assuming success', $data);
+                    // حالة غير معروفة - افتراض أنها نجاح إذا لم يكن هناك error
+                    $payment->update(['status' => 'paid']);
+
+                    if ($payment->payable_type === 'App\\Models\\Post') {
+                        $post = \App\Models\Post::find($payment->payable_id);
+                        if ($post) {
+                            $post->update([
+                                'is_featured' => true,
+                                'featured_until' => now()->addMonths(3),
+                            ]);
+                            return redirect()->route('the_posts.show', $post->id)
+                                ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
+                        }
+                    }
+                    return view('payments.success', ['message' => 'تم الدفع بنجاح!']);
+                }
+            } else {
+                // إذا لم يكن هناك payment
+                return response()->json([
+                    'error' => 'Payment record not found',
+                    'paymentId' => $data['paymentId']
+                ], 404);
+            }
+        } else {
+            // إذا لم يكن هناك paymentId
+            return response()->json([
+                'error' => 'Payment ID missing in webhook data',
+                'data' => $data
+            ], 400);
+        }
+    }
 
     public function show(Page $the_page)
     {
@@ -185,7 +325,7 @@ class PageController extends Controller
                     }
                 }
 
-                return view('payments.success')->with('message', 'تم الدفع بنجاح!');
+                return redirect()->route('payments.success')->with('message', 'تم الدفع بنجاح!');
             }
         }
 

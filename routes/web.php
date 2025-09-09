@@ -317,3 +317,5 @@ Route::controller(FacebookController::class)->group(function () {
 // routes/web.php
 
 Route::post('phone/send-code', [PhoneVerificationController::class, 'sendCode'])->name('phone.send.code');
+
+Route::post('/payment-status', [PageController::class, 'paymentWebhook']);
