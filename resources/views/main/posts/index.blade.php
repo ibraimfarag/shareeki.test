@@ -309,14 +309,14 @@
 
                                     </div>
                                 </div>
-                                <div class="col-2 mt-3">
+                                <div class="col-lg-2 col-4 mt-3">
                                     <button onclick="search()"
                                         class="btn main-btn gold-btn medium-btn rounded-btn me-2 w-100">
                                         بحث
                                     </button>
                                 </div>
 
-                                <div class="col-2 mt-3">
+                                <div class="col-lg-2 col-5 mt-3">
                                     <a href="{{asset('/')}}"
                                         class="btn main-btn gold-btn medium-btn rounded-btn me-2 w-100">
                                         إعادة تعيين
@@ -457,7 +457,7 @@
                 <div class="swiper-button-next"></div>
                 <div class="swiper-button-prev"></div>
                 <!-- Add Pagination -->
-                <div class="swiper-pagination"></div>
+                {{-- <div class="swiper-pagination"></div> --}}
             </div>
         </div>
     </section>
@@ -628,7 +628,7 @@
             };
 
             @auth
-                                                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -639,12 +639,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                            <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                              <p class="h4">
-                                              لا توجد اي معلومات مطابقة
-                                              </p>
-                                           </div>
-                                            </div>`);
+                                                <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                                  <p class="h4">
+                                                  لا توجد اي معلومات مطابقة
+                                                  </p>
+                                               </div>
+                                                </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
