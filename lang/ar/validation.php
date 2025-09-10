@@ -205,6 +205,20 @@ return [
         'phone_code' => 'رمز التفعيل',
         'phone_full' => 'رقم الجوال',
         'check_terms' => 'الشروط والأحكام',
+
+        // إضافات خاصة بإضافة العرض
+        'category_id' => 'فئة الإعلان',
+        'sort' => 'نوع الفرصة',
+        'area_id' => 'المنطقة',
+        'partners_no' => 'عدد الشركاء',
+        'body' => 'وصف الفرصة',
+        'main_image' => 'الصورة الرئيسية',
+        'the_attachment' => 'المرفق',
+        'the_attachment.*' => 'المرفق',
+        'partner_sort' => 'نوع الشريك',
+        'partnership_percentage' => 'نسبة الشراكة',
+        'the_tags' => 'الكلمات المفتاحية',
+        'weeks_hours' => 'ساعات العمل الأسبوعية',
     ],
 
 ];

@@ -73,7 +73,7 @@ class PageController extends Controller
 
         // تحديد حالة الدفع بناءً على النتيجة
         if (isset($data['result'])) {
-            if ($data['result'] == 'SUCCESS') {
+            if ($data['result'] == 'CAPTURED') {
                 $commissionPayment->update(['status' => 'success']);
                 return view('payments.success', ['message' => 'تم دفع العمولة بنجاح!']);
 
@@ -160,7 +160,7 @@ class PageController extends Controller
                     // dd('Has result field', $data['result']);
                     // الحالة الأولى: يوجد result (SUCCESS, CANCELED, NOT CAPTURED)
 
-                    if ($data['result'] == 'SUCCESS') {
+                    if ($data['result'] == 'CAPTURED') {
                         // dd('SUCCESS case - Payment successful', $data);
                         $payment->update(['status' => 'paid']);
 

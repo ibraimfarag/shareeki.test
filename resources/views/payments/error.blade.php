@@ -48,7 +48,7 @@
                 <div class="container">
                     <div class="header-navbar">
                         <div class="header-logo">
-                            <a href="index-1.html"><img class="light-version-logo"
+                            <a href="/"><img class="light-version-logo"
                                     src="{{asset('assets/media/logo.svg')}}" alt="logo"></a>
 
                         </div>
@@ -97,9 +97,7 @@
                             @else
                                 <h4>حاول مرة أخرى او تواصل مع الإدارة لحل المشكلة، شكرا لحرصك</h4>
                             @endif <div class="d-flex gap-3 mt-4">
-                                <a href="javascript:history.back()" class="axil-btn btn-outline-primary">المحاولة مرة
-                                    أخرى</a>
-                                <a href="/" class="axil-btn btn-fill-primary">العوده للرئيسيه</a>
+                                                              <a href="/" class="axil-btn btn-fill-primary">العوده للرئيسيه</a>
                             </div>
                         </div>
                     </div>
