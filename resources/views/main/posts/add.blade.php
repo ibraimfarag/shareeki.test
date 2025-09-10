@@ -7,7 +7,7 @@
                     <div class="border border-radius-medium p-lg-5 p-sm-3 p-2">
                         <h3 class="h3 text-dark-heading mb-3"> إضــــافــــة عـــــرض جـــــديـــــد</h3>
 
-                        
+
                         <div class="border-top pt-4">
                             <form method="POST" action="{{ route('the_posts.store') }}" novalidate id="post_add_form"
                                 enctype="multipart/form-data">
@@ -107,7 +107,8 @@
                                                 <div
                                                     class="col-sm-4 px-0 col-lg-3 col-12 card border border-radius-rounded bg-gray-light card-transition m-2">
                                                     <div class="card-body p-0">
-                                                        <input type="radio" onclick="getSubCategories(this);" class="btn-check @error('category_id') is-invalid @enderror"
+                                                        <input type="radio" onclick="getSubCategories(this);"
+                                                            class="btn-check @error('category_id') is-invalid @enderror"
                                                             name="main_category_id" value="{{$category->id}}"
                                                             id="sectionoption{{$category->id}}" autocomplete="off">
                                                         <label
@@ -120,7 +121,7 @@
                                             @endforeach
 
                                         </div>
-                                        
+
                                         <!-- رسالة خطأ للفئة الرئيسية -->
                                         @error('category_id')
                                             <div class="invalid-feedback d-block mt-2" role="alert">
@@ -134,14 +135,15 @@
                                         <label for="opportunityField" class="form-label text-dark-heading">
                                             <i class="fas fa-arrow-down me-1"></i>
                                             مجال الفرصة التفصيلي
-                                            <small class="text-muted d-block">اختر القطاع أولاً لتظهر المجالات المتاحة</small>
+                                            <small class="text-muted d-block">اختر القطاع أولاً لتظهر المجالات
+                                                المتاحة</small>
                                         </label>
                                         <select class="category_id form-control @error('category_id') is-invalid @enderror"
-                                            name="category_id" id="category_id" onchange="changeDefaultPic()" required disabled>
+                                            name="category_id" id="category_id" onchange="changeDefaultPic()" required
+                                            disabled>
                                             <option value="">اختر القطاع أولاً لإظهار المجالات</option>
                                             @foreach ($subcategories as $subcategory)
-                                                <option value="{{ $subcategory['id']}}"
-                                                    {{ old('category_id') == $subcategory['id'] ? 'selected' : '' }}>
+                                                <option value="{{ $subcategory['id']}}" {{ old('category_id') == $subcategory['id'] ? 'selected' : '' }}>
                                                     {{$subcategory->name}}
                                                 </option>
                                             @endforeach
@@ -167,8 +169,7 @@
                                             class="form-control @error('the_tags') is-invalid @enderror">
                                             <option value="">اختر المهارة المطلوبة</option>
                                             @foreach ($tags as $tag)
-                                                <option value="{{ $tag->id}}" 
-                                                    {{ old('the_tags') == $tag->id ? 'selected' : '' }}>
+                                                <option value="{{ $tag->id}}" {{ old('the_tags') == $tag->id ? 'selected' : '' }}>
                                                     {{ $tag->name->en }}
                                                 </option>
                                             @endforeach
@@ -190,8 +191,7 @@
                                                 class="card border border-radius-rounded bg-gray-light card-transition me-3">
                                                 <div class="card-body p-0">
                                                     <input type="radio" class="btn-check" value="on" id="full_partnership"
-                                                        name="full_partnership" onchange="togglePartnersSection()"
-                                                        {{ old('full_partnership') == 'on' ? 'checked' : '' }}
+                                                        name="full_partnership" onchange="togglePartnersSection()" {{ old('full_partnership') == 'on' ? 'checked' : '' }}
                                                         autocomplete="off">
                                                     <label
                                                         class="btn btn-checked-rounded f4 card-text text-dark-content mb-0  px-3 py-2"
@@ -204,8 +204,7 @@
                                                 class="card border border-radius-rounded bg-gray-light card-transition me-3">
                                                 <div class="card-body p-0">
                                                     <input type="radio" class="btn-check" value="off" id="loan"
-                                                        name="full_partnership" onchange="togglePartnersSection()"
-                                                        {{ old('full_partnership') == 'off' ? 'checked' : '' }}
+                                                        name="full_partnership" onchange="togglePartnersSection()" {{ old('full_partnership') == 'off' ? 'checked' : '' }}
                                                         autocomplete="off">
                                                     <label
                                                         class="btn btn-checked-rounded f4 card-text text-dark-content mb-0  px-3 py-2"
@@ -508,18 +507,18 @@
             // تفعيل حقل الفئة الفرعية
             $('#category_id').prop('disabled', false);
             $('#category_id').html('<option value="">جاري تحميل المجالات...</option>');
-            
+
             axios.get('list_subcategories/' + item.value)
                 .then((data) => {
                     subCategories = data.data;
                     changeDefaultPic();
                     $("#flexSwitchCheckChecked").val(1);
                     console.log(386, $("#flexSwitchCheckChecked").val())
-                    
+
                     // تحديث خيارات الفئة الفرعية
                     $('#category_id').empty();
                     $('#category_id').append('<option value="">اختر مجال الفرصة التفصيلي</option>');
-                    
+
                     for (subcity of data.data) {
                         $('#category_id').append('<option value="' + subcity.id + '">' + subcity.name + '</option>');
                     }
@@ -691,7 +690,7 @@
             @endguest
 
                 @auth
-                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!}
+                                var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!}
                     if (userVerified == 1968) {
 
                         swalMessageIfUnauthenticatedOne();
@@ -702,17 +701,17 @@
 
             let allAreFilled = true;
             let missingFields = [];
-            
+
             document.getElementById("post_add_form").querySelectorAll("[required]").forEach(function (i) {
                 if (!allAreFilled && missingFields.length > 3) return; // حد أقصى 3 حقول للرسالة
-                
+
                 let fieldName = getFieldDisplayName(i.name, i.id);
-                
+
                 if (!i.value) {
                     allAreFilled = false;
                     missingFields.push(fieldName);
                 }
-                
+
                 if (i.type === "checkbox") {
                     let radioValueCheck = false;
                     document.getElementById("post_add_form").querySelectorAll(`[name=${i.name}]`).forEach(function (r) {
@@ -728,7 +727,7 @@
 
                 if (i.type === "radio") {
                     let radioValueCheck2 = false;
-                    document.getElementById("post_add_form").querySelectorAll(`[name=${i.name}]`).forEach(function(r) {
+                    document.getElementById("post_add_form").querySelectorAll(`[name=${i.name}]`).forEach(function (r) {
                         if (r.checked) radioValueCheck2 = true;
                     })
                     if (!radioValueCheck2) {
@@ -739,7 +738,7 @@
                     }
                 }
             });
-            
+
             console.log(567, $("#flexSwitchCheckChecked").val())
             if (!allAreFilled) {
                 let missingFieldsText = missingFields.join('، ');
@@ -747,24 +746,24 @@
                     icon: 'warning',
                     title: 'حقول ناقصة',
                     html: `
-                        <div class="text-right">
-                            <p>يرجى تعبئة الحقول التالية:</p>
-                            <ul class="list-unstyled text-danger">
-                                ${missingFields.map(field => `<li><i class="fas fa-exclamation-triangle me-1"></i>${field}</li>`).join('')}
-                            </ul>
-                        </div>
-                    `,
+                            <div class="text-right">
+                                <p>يرجى تعبئة الحقول التالية:</p>
+                                <ul class="list-unstyled text-danger">
+                                    ${missingFields.map(field => `<li><i class="fas fa-exclamation-triangle me-1"></i>${field}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `,
                     confirmButtonText: 'حسناً',
                     confirmButtonColor: '#007bff'
                 });
-                
+
                 // التركيز على أول حقل ناقص
                 let firstMissingField = document.getElementById("post_add_form").querySelector("[required]:invalid, [required][value='']");
                 if (firstMissingField) {
                     firstMissingField.focus();
                     firstMissingField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
-                
+
                 return;
             }
 
@@ -817,19 +816,19 @@
         }
 
         // تحسين مظهر اختيار القطاع
-        $(document).ready(function() {
+        $(document).ready(function () {
             // إضافة تأثير بصري عند اختيار القطاع
-            $('input[name="main_category_id"]').change(function() {
+            $('input[name="main_category_id"]').change(function () {
                 $('.card-transition').removeClass('border-primary');
                 $(this).closest('.card-transition').addClass('border-primary');
-                
+
                 // إضافة رسالة توضيحية
                 $('#category_id').attr('disabled', false);
                 if ($('#category_id option').length <= 1) {
                     $('#category_id').append('<option value="">جاري تحميل المجالات...</option>');
                 }
             });
-            
+
             // التحقق من حالة أبحث عن عند تحميل الصفحة
             togglePartnersSection();
         });
@@ -849,7 +848,7 @@
                 'partnership_percentage': 'نسبة الشراكة',
                 'weeks_hours': 'ساعات العمل الأسبوعية'
             };
-            
+
             return fieldNames[fieldName] || fieldNames[fieldId] || fieldName || fieldId || 'حقل غير محدد';
         }
 
@@ -858,22 +857,22 @@
             const loanRadio = document.getElementById('loan');
             const partnersSection = document.getElementById('partners_section');
             const partnersInput = document.getElementById('partners_no');
-            
+
             if (loanRadio && loanRadio.checked) {
                 // إخفاء قسم عدد الشركاء عند اختيار "تمويل قرض"
                 partnersSection.style.display = 'none';
                 partnersInput.removeAttribute('required');
                 partnersInput.value = '0'; // تعيين قيمة افتراضية
-                
+
                 // إزالة رسائل الخطأ إن وجدت
                 const errorElement = partnersSection.querySelector('.invalid-feedback');
                 if (errorElement) {
                     errorElement.style.display = 'none';
                 }
-                
+
                 // إضافة تأثير بصري
                 partnersSection.classList.add('hidden');
-                
+
                 console.log('تم إخفاء قسم عدد الشركاء - تمويل قرض');
             } else {
                 // إظهار قسم عدد الشركاء عند اختيار "شراكة"
@@ -882,49 +881,49 @@
                 if (partnersInput.value === '0' || !partnersInput.value) {
                     partnersInput.value = '1'; // قيمة افتراضية للشراكة
                 }
-                
+
                 // إظهار رسائل الخطأ إن وجدت
                 const errorElement = partnersSection.querySelector('.invalid-feedback');
                 if (errorElement) {
                     errorElement.style.display = 'block';
                 }
-                
+
                 // إزالة تأثير الإخفاء
                 partnersSection.classList.remove('hidden');
-                
+
                 console.log('تم إظهار قسم عدد الشركاء - شراكة');
             }
         }
 
     </script>
-    
+
     <style>
         /* تحسين مظهر قطاع الفرصة */
         .card-transition {
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        
+
         .card-transition:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .card-transition.border-primary {
             border-color: #007bff !important;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
-        
+
         /* تحسين مظهر الملصقات */
         .form-label .fas {
             color: #6c757d;
         }
-        
+
         .text-muted {
             font-size: 0.85em;
             font-style: italic;
         }
-        
+
         /* تحسين مظهر رسائل الخطأ */
         .invalid-feedback.d-block {
             margin-top: 0.5rem;
@@ -934,28 +933,28 @@
             border-radius: 0.25rem;
             color: #721c24;
         }
-        
+
         /* تحسين مظهر SweetAlert للحقول الناقصة */
         .swal2-popup .text-right {
             text-align: right;
             direction: rtl;
         }
-        
+
         .swal2-popup .list-unstyled li {
             margin-bottom: 0.5rem;
             padding: 0.25rem 0;
         }
-        
+
         .swal2-popup .text-danger {
             color: #dc3545 !important;
         }
-        
+
         /* تأثير سلس لإخفاء/إظهار قسم الشركاء */
         #partners_section {
             transition: all 0.3s ease;
             overflow: hidden;
         }
-        
+
         #partners_section.hidden {
             opacity: 0;
             max-height: 0;

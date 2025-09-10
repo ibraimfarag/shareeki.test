@@ -408,22 +408,13 @@
         <div class="container" style="padding: 0.2rem 0;">
             <h2 class="h2 text-dark-heading text-center mb-1" style="font-size: 1rem; font-weight: bold; color: #007bff;">
                 الفرص المميزة</h2>
-            <div class="swiper-container" style="overflow: hidden; min-height: 270px;">
-                <style>
-                    @media (max-width: 576px) {
-                        #services-mobile .swiper-container {
-                            overflow: hidden;
-                            min-height: 270px;
-                            touch-action: pan-x;
-                        }
-                    }
-                </style>
+            <div class="swiper premium-swiper" style="overflow: hidden; min-height: 270px; direction: rtl;">
                 <div class="swiper-wrapper">
                     <!-- card -->
                     @foreach ($paidPosts as $paidPost)
                         <div class="swiper-slide">
                             <div class="card box-shadow-medium border-radius-medium card-hover"
-                                style="max-width: 70%; margin: 0 auto;">
+                                style="max-width: 85%; margin: 0 auto;">
                                 <a href="{{ route('the_posts.show', $paidPost->id) }}">
                                     <img class="img-ad"
                                         src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
@@ -449,7 +440,7 @@
                         <div class="swiper-slide">
                             <a href="{{ route('the_posts.create') }}">
                                 <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space"
-                                    style="max-width: 70%; margin: 0 auto;">
+                                    style="max-width: 85%; margin: 0 auto;">
                                     <div class="card-body text-center">
                                         <h4 class="h4 card-title text-dark-heading mb-1">اغتنم الفرصة الآن!</h4>
                                         <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور
@@ -462,8 +453,11 @@
                         </div>
                     @endfor
                 </div>
-                <!-- Add Progress Bar -->
-                <div class="swiper-pagination swiper-pagination-progressbar"></div>
+                <!-- Add Navigation Arrows -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
             </div>
         </div>
     </section>
@@ -634,7 +628,7 @@
             };
 
             @auth
-                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -645,12 +639,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                          <p class="h4">
-                                          لا توجد اي معلومات مطابقة
-                                          </p>
-                                       </div>
-                                        </div>`);
+                                            <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                              <p class="h4">
+                                              لا توجد اي معلومات مطابقة
+                                              </p>
+                                           </div>
+                                            </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
@@ -710,27 +704,117 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            new Swiper('.swiper-container', {
-                slidesPerView: 1,
-                spaceBetween: 10,
+            // إعدادات Swiper للفرص المميزة في الموبايل
+            new Swiper('.premium-swiper', {
+                slidesPerView: 1.2,
+                spaceBetween: 15,
+                centeredSlides: true,
                 loop: true,
                 autoplay: {
-                    delay: 3000,
+                    delay: 4000,
                     disableOnInteraction: false,
                 },
                 pagination: {
                     el: '.swiper-pagination',
-                    type: 'progressbar',
+                    clickable: true,
+                    dynamicBullets: true,
                 },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                // تحسين الأداء واللمس
+                touchRatio: 1,
+                touchAngle: 45,
+                grabCursor: true,
+                effect: 'slide',
+                speed: 400,
+                // إعدادات للشاشات المختلفة
                 breakpoints: {
+                    320: {
+                        slidesPerView: 1.1,
+                        spaceBetween: 10,
+                    },
+                    480: {
+                        slidesPerView: 1.3,
+                        spaceBetween: 15,
+                    },
+                    640: {
+                        slidesPerView: 1.5,
+                        spaceBetween: 20,
+                    },
                     768: {
                         slidesPerView: 2,
+                        spaceBetween: 25,
                     },
-                    576: {
-                        slidesPerView: 1,
+                },
+                // لدعم اللغة العربية
+                on: {
+                    init: function () {
+                        console.log('Swiper للفرص المميزة تم تحميله بنجاح');
                     },
                 },
             });
         });
     </script>
+
+    <style>
+        /* تحسين مظهر Swiper للموبايل */
+        .premium-swiper {
+            padding-bottom: 50px !important;
+        }
+
+        .premium-swiper .swiper-slide {
+            transition: transform 0.3s ease;
+        }
+
+        .premium-swiper .swiper-slide-active {
+            transform: scale(1.02);
+        }
+
+        .premium-swiper .swiper-pagination {
+            bottom: 10px !important;
+        }
+
+        .premium-swiper .swiper-pagination-bullet {
+            background: #007bff;
+            opacity: 0.5;
+        }
+
+        .premium-swiper .swiper-pagination-bullet-active {
+            opacity: 1;
+            background: #0056b3;
+        }
+
+        .premium-swiper .swiper-button-next,
+        .premium-swiper .swiper-button-prev {
+            color: #007bff;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            margin-top: -17px;
+        }
+
+        .premium-swiper .swiper-button-next:after,
+        .premium-swiper .swiper-button-prev:after {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+
+            .premium-swiper .swiper-button-next,
+            .premium-swiper .swiper-button-prev {
+                width: 30px;
+                height: 30px;
+                margin-top: -15px;
+            }
+
+            .premium-swiper .swiper-button-next:after,
+            .premium-swiper .swiper-button-prev:after {
+                font-size: 12px;
+            }
+        }
+    </style>
 @endsection
