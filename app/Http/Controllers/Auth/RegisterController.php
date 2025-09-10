@@ -73,10 +73,7 @@ class RegisterController extends Controller
             \Log::info('كود التفعيل صحيح', ['phone' => $phone, 'code' => $code]);
             Cache::forget('phone_verification_' . $phone);
 
-            $emailVerificationEnabled = config('app.EMAIL_VERIFICATION_ENABLED');
-            if ($emailVerificationEnabled === null) {
-                $emailVerificationEnabled = env('EMAIL_VERIFICATION_ENABLED', true);
-            }
+            $emailVerificationEnabled = env('EMAIL_VERIFICATION_ENABLED', true);
 
             $userData = [
                 'name' => $data['name'],
