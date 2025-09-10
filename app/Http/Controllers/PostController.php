@@ -473,7 +473,7 @@ class PostController extends Controller
         $payment = Payment::create([
             'user_id' => auth()->id(),
             'gateway' => 'rajhi',
-            'amount' => 149.50, // السعر الإجمالي شامل الضريبة
+            'amount' => env('FEATURED_POST_PRICE', 149.50), // السعر الإجمالي شامل الضريبة
             'currency' => 'SAR',
             'status' => 'pending',
             'gateway_order_id' => \Illuminate\Support\Str::uuid()->toString(),
@@ -590,7 +590,7 @@ class PostController extends Controller
         $payment = Payment::create([
             'user_id' => auth()->id(),
             'gateway' => 'rajhi',
-            'amount' => 149.50, // السعر الإجمالي شامل الضريبة
+            'amount' => env('FEATURED_POST_PRICE', 149.50), // السعر الإجمالي شامل الضريبة
             'currency' => 'SAR',
             'status' => 'pending',
             'gateway_order_id' => \Illuminate\Support\Str::uuid()->toString(),
