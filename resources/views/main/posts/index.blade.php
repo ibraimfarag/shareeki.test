@@ -528,17 +528,24 @@
             </nav>
         </div>
         <style>
-            @media (max-width: 576px) {
-                .deletePagination {
-                    max-width: 340px;
-                    padding-left: 0;
-                    padding-right: 0;
-                }
+@media (max-width: 576px) {
+    .deletePagination {
+        max-width: 100%;
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        overflow-x: auto;
+    }
 
-                .pagination {
-                    font-size: 0.85rem;
-                }
-            }
+    .pagination {
+        font-size: 0.85rem;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-width: 340px;
+        overflow-x: auto;
+        display: flex;
+    }
+}
         </style>
     </div>
     <!--  -->
