@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-              $this->app->singleton(AdPricingService::class, function ($app) {
+        $this->app->singleton(AdPricingService::class, function ($app) {
             return new AdPricingService();
         });
 
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->share('settings', Settings::findOrFail(1));
 
-        view()->share('adminContact', Contact::whereNull('title')->whereNull('image')->take(3)->OrderBy('id','DESC')->get());
+        view()->share('adminContact', Contact::whereNull('title')->whereNull('image')->take(3)->OrderBy('id', 'DESC')->get());
         view()->share('adminLatestPosts', Post::Latest()->take(5)->get());
 
     }
