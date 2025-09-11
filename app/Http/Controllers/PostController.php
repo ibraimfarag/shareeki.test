@@ -346,7 +346,7 @@ class PostController extends Controller
         
         $post = $the_post;
 
-        return view('main.posts.show', ["post" => $the_post, "tags" => json_decode($tags)]);
+        return view('main.posts.show', ["post" => $the_post, "tags" => $tags]);
 
         // $the_post = Post::find($id);
         // if (!isset($the_post->title)){
