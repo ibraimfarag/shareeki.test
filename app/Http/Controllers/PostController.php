@@ -130,15 +130,20 @@ class PostController extends Controller
     public function create()
     {
         $user = auth()->user();
-        if (!$user || empty($user->phone)) {
+        // إذا لم يكن المستخدم مسجل دخول، إعادة توجيه لصفحة تسجيل الدخول
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'يجب تسجيل الدخول أولاً لإضافة فرصة جديدة.');
+        }
+        // إذا لم يكن رقم الجوال موجود، إعادة توجيه لصفحة المعلومات الشخصية
+        if (empty($user->phone)) {
             return redirect()->route('get_personal_info')->withErrors(['phone' => 'يجب إضافة رقم الجوال أولاً قبل إضافة فرصة جديدة.']);
         }
+
         $theTags = Tag::whereNotNull('id')->get();
         $tags = [];
         foreach ($theTags as $tag) {
             array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
         }
-
 
         $aggrements = Page::whereName('agreements')->firstOrFail();
         return view(

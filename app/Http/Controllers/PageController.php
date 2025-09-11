@@ -174,11 +174,11 @@ class PageController extends Controller
                                 ]);
                                 // return redirect()->route('the_posts.show', $post->id)
                                 //     ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
-                                return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر!']);
+                                return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر']);
 
                             }
                         }
-                        return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر!']);
+                        return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر']);
 
                     } elseif ($data['result'] == 'CANCELED') {
                         // dd('CANCELED case - Payment canceled', $data,$payment->payable_type);
@@ -237,7 +237,7 @@ class PageController extends Controller
                                 'is_featured' => true,
                                 'featured_until' => now()->addMonths(3),
                             ]);
-                            return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر!']);
+                            return view('payments.success', ['message' => 'تم الدفع و تمييز الإعلان بنجاح لمدة 3 أشهر']);
 
                             // return redirect()->route('the_posts.show', $post->id)
                             //     ->with('success', 'تم تمييز الإعلان بنجاح لمدة 3 أشهر!');
