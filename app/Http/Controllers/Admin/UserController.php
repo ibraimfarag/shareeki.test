@@ -22,6 +22,12 @@ class UserController extends Controller
             $users = User::orderByDesc('id')->get();
 
             return DataTables::of($users)->addIndexColumn()
+                ->addColumn('birth_date', function ($row) {
+                    return $row->birth_date ? $row->birth_date->format('Y-m-d') : '-';
+                })
+                ->addColumn('max_budget', function ($row) {
+                    return $row->max_budget ? number_format($row->max_budget) . ' ريال' : '-';
+                })
                 ->addcolumn('email_verified_at', function ($row) {
                     $btn = $row->email_verified_at == null ? 'غير مفعل' : 'مفعل';
                     return $btn; })

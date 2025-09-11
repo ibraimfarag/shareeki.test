@@ -18,6 +18,42 @@ use Spatie\Tags\Tag;
 class AdminPostController extends Controller
 {
     /**
+     * Display featured posts only.
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function featured(): \Illuminate\Contracts\View\View
+    {
+        $featuredPosts = Post::featured()->get();
+        return view('admin.posts.featured', compact('featuredPosts'));
+    }
+
+    /**
+     * Show post details for modal
+     */
+    public function modalShow(Post $post)
+    {
+        return view('admin.posts.partials.modal-show', compact('post'));
+    }
+
+    /**
+     * Show post edit form for modal
+     */
+    public function modalEdit(Post $post)
+    {
+        $theTags = Tag::all(["id", "name"]);
+        $tags = [];
+        foreach ($theTags as $tag) {
+            array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
+        }
+
+        return view('admin.posts.partials.modal-edit', [
+            'post' => $post,
+            'countries' => Area::whereParentId(1)->orderBy('position')->get(),
+            'categories' => Category::whereNull('category_id')->get(),
+            'tags' => $tags
+        ]);
+    }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -30,19 +66,31 @@ class AdminPostController extends Controller
 
 
             return DataTables::of($categories)->addIndexColumn()
-            ->addcolumn('action', function($row){ $btn = '<a target="_blank" href="'.route("posts.show", [$row->slug]).'" class="btn btn-primary">عرض</a>'; return $btn; })
-            ->addColumn('actionone', function($row){$btn = '<a href="'.route("posts.edit", [$row->slug]).'" class="edit btn btn-primary btn-sm">تعديل</a>';return $btn;})
-            ->addColumn('actiontwo', function($row){$btn = '<a href="'.route("posts.delete", [$row->slug]).'" class="delete btn btn-danger btn-sm">حذف</a>';return $btn;})
-            ->addColumn('actionthree', function($row){$btn = '<a href="'.route("posts.block", [$row->slug]).'" class="block btn btn-warning btn-sm">حظر</a>';return $btn;})
-            ->rawColumns(['action','actionone','actiontwo','actionthree'])
-            ->addIndexColumn()
-            ->make(true);
+                ->addcolumn('action', function ($row) {
+                    $btn = '<a target="_blank" href="' . route("posts.show", [$row->slug]) . '" class="btn btn-primary">عرض</a>';
+                    return $btn;
+                })
+                ->addColumn('actionone', function ($row) {
+                    $btn = '<a href="' . route("posts.edit", [$row->slug]) . '" class="edit btn btn-primary btn-sm">تعديل</a>';
+                    return $btn;
+                })
+                ->addColumn('actiontwo', function ($row) {
+                    $btn = '<a href="' . route("posts.delete", [$row->slug]) . '" class="delete btn btn-danger btn-sm">حذف</a>';
+                    return $btn;
+                })
+                ->addColumn('actionthree', function ($row) {
+                    $btn = '<a href="' . route("posts.block", [$row->slug]) . '" class="block btn btn-warning btn-sm">حظر</a>';
+                    return $btn;
+                })
+                ->rawColumns(['action', 'actionone', 'actiontwo', 'actionthree'])
+                ->addIndexColumn()
+                ->make(true);
 
         }
         return view('admin.posts.index');
     }
 
-     /**
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -51,11 +99,11 @@ class AdminPostController extends Controller
     {
         $theTags = Tag::all(["id", "name"]);
         $tags = [];
-        foreach($theTags as $tag){
+        foreach ($theTags as $tag) {
             array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
         }
 
-        return view('admin.posts.add', ['countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'tags' => $tags ]);
+        return view('admin.posts.add', ['countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'tags' => $tags]);
     }
 
     /**
@@ -67,37 +115,43 @@ class AdminPostController extends Controller
     public function store(PostFormRequest $request)
     {
 
-        $request->full_partnership != "on" ? : $partner_sort[0] = "on";
-        $request->loan != "on" ? : $partner_sort[1] = "on";
+        $request->full_partnership != "on" ?: $partner_sort[0] = "on";
+        $request->loan != "on" ?: $partner_sort[1] = "on";
 
-        if(!isset($partner_sort)) { $partner_sort[0] = "on";  $partner_sort[1] = "on";}
+        if (!isset($partner_sort)) {
+            $partner_sort[0] = "on";
+            $partner_sort[1] = "on";
+        }
 
         //upload only if request has main_image
-        if($request->has('main_image')) $request->merge(['img' => Upload::uploadImage($request->main_image, 'posts' , $request->title)]);
+        if ($request->has('main_image'))
+            $request->merge(['img' => Upload::uploadImage($request->main_image, 'posts', $request->title)]);
 
         // Prepare All Request Input Either For Entering DB Or For Other Process Depending On Other Model
-        $request->merge(['code' => rand(10,50000), 'user_id' => 0, 'slug' => Str::slug($request->title), 'tags' => explode(',' , $request->the_tags), 'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT)]);
+        $request->merge(['code' => rand(10, 50000), 'user_id' => 0, 'slug' => Str::slug($request->title), 'tags' => explode(',', $request->the_tags), 'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT)]);
 
         // Create Post
-        $post = Post::create($request->except('_token','visible', 'main_image' , 'the_attachment', 'tags', 'the_tags', 'full_partnership', 'loan'));
+        $post = Post::create($request->except('_token', 'visible', 'main_image', 'the_attachment', 'tags', 'the_tags', 'full_partnership', 'loan'));
 
         // Get It's name for make a special attachments folder for
         $postName = $post->title;
 
         // Add The Post Tags
-        foreach($request->tags as $tag) { DB::table('taggables')->insert(['tag_id' => $tag, 'taggable_type' => 'App\Post', 'taggable_id' => $post->id]); }
+        foreach ($request->tags as $tag) {
+            DB::table('taggables')->insert(['tag_id' => $tag, 'taggable_type' => 'App\Post', 'taggable_id' => $post->id]);
+        }
 
         // Add The Attachments
-        if($request->has('the_attachment')){
+        if ($request->has('the_attachment')) {
             foreach ($request->the_attachment as $attachment) {
-                Attachment::create(['post_id' => $post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}" , $postName."_".rand(0,100000))]);
+                Attachment::create(['post_id' => $post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}", $postName . "_" . rand(0, 100000))]);
             }
         }
 
         return view('admin.posts.index');
     }
 
-     /**
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Post  $post
@@ -120,22 +174,22 @@ class AdminPostController extends Controller
 
         //$tags = [];
         //foreach($theTags as $tag){
-         //   array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
-       // }
+        //   array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
+        // }
 
         $theTags = Tag::whereNotNull('id')->get();
         $tags = [];
-        foreach($theTags as $tag){
+        foreach ($theTags as $tag) {
             array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
         }
 
         $post->partner_sort = json_decode($post->partner_sort, true);
 
 
-        return view('admin.posts.edit', ['post' => $post , 'countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'theCity' => $city, 'theCountry' => $country , 'theCategory' => $category, 'theSubCategory' => $subCategory, 'tags' => json_decode($theTags) ]);
+        return view('admin.posts.edit', ['post' => $post, 'countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'theCity' => $city, 'theCountry' => $country, 'theCategory' => $category, 'theSubCategory' => $subCategory, 'tags' => json_decode($theTags)]);
     }
 
-      public function show(Post $post)
+    public function show(Post $post)
     {
         // Get Current Country Then City
         $city = Area::where('id', $post->area_id)->first();
@@ -150,14 +204,14 @@ class AdminPostController extends Controller
 
         $theTags = Tag::all(["id", "name"]);
         $tags = [];
-        foreach($theTags as $tag){
+        foreach ($theTags as $tag) {
             array_push($tags, ["id" => $tag->id, "text" => $tag->name]);
         }
 
         $post->partner_sort = json_decode($post->partner_sort, true);
 
 
-        return view('admin.posts.show', ['post' => $post , 'countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'theCity' => $city, 'theCountry' => $country , 'theCategory' => $category, 'theSubCategory' => $subCategory, 'tags' => $tags ]);
+        return view('admin.posts.show', ['post' => $post, 'countries' => Area::whereParentId(1)->orderBy('position')->get(), 'categories' => Category::whereNull('category_id')->get(), 'theCity' => $city, 'theCountry' => $country, 'theCategory' => $category, 'theSubCategory' => $subCategory, 'tags' => $tags]);
     }
 
     /**
@@ -170,38 +224,42 @@ class AdminPostController extends Controller
     public function update(PostFormRequest $request, Post $post)
     {
 
-        $request->full_partnership != "on" ? : $partner_sort[0] = "on";
-        $request->loan != "on" ? : $partner_sort[1] = "on";
+        $request->full_partnership != "on" ?: $partner_sort[0] = "on";
+        $request->loan != "on" ?: $partner_sort[1] = "on";
 
-        if($request->loan == "on") { $request->merge(['partnership_percentage' => '0.00%']); }
+        if ($request->loan == "on") {
+            $request->merge(['partnership_percentage' => '0.00%']);
+        }
 
         // check if request has main_image
-        if($request->has('main_image')) {
-            $request->merge(['img' => Upload::uploadImage($request->main_image, 'posts' , $post->title)]);
+        if ($request->has('main_image')) {
+            $request->merge(['img' => Upload::uploadImage($request->main_image, 'posts', $post->title)]);
 
         }
 
         // Prepare All Request Input Either For Entering DB Or For Other Process Depending On Other Model
-        $request->merge(['tags' => explode(',' , $request->the_tags), 'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT) ]);
+        $request->merge(['tags' => explode(',', $request->the_tags), 'partner_sort' => json_encode($partner_sort, JSON_FORCE_OBJECT)]);
 
         // Update The Post
-        $post->update($request->except('_token','visible', 'main_image' , 'the_attachment', 'tags', 'the_tags' ,'full_partnership', 'loan'));
+        $post->update($request->except('_token', 'visible', 'main_image', 'the_attachment', 'tags', 'the_tags', 'full_partnership', 'loan'));
 
         // Get It's name for make a special attachments folder for
         $postName = $post->title;
 
         // Update The Post Tags
-        DB::table('taggables')->where('taggable_id' , $post->id)->delete();
-        foreach($request->tags as $tag) { DB::table('taggables')->insert(['tag_id' => $tag, 'taggable_type' => 'App\Post', 'taggable_id' => $post->id]); }
+        DB::table('taggables')->where('taggable_id', $post->id)->delete();
+        foreach ($request->tags as $tag) {
+            DB::table('taggables')->insert(['tag_id' => $tag, 'taggable_type' => 'App\Post', 'taggable_id' => $post->id]);
+        }
 
         // Add The Attachments
-        if($request->has('the_attachment')){
+        if ($request->has('the_attachment')) {
             foreach ($request->the_attachment as $attachment) {
-                Attachment::create(['post_id' => $post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}" , $postName."_".rand(0,100000))]);
+                Attachment::create(['post_id' => $post->id, 'name' => Upload::uploadImage($attachment, "attachments/${postName}", $postName . "_" . rand(0, 100000))]);
             }
         }
 
-        return redirect()->route('posts.index')->with('success','تم تعديل البيانات بنجاح');
+        return redirect()->route('posts.index')->with('success', 'تم تعديل البيانات بنجاح');
     }
 
     /**
@@ -215,10 +273,11 @@ class AdminPostController extends Controller
         return $post->delete() ? redirect()->route('posts.index') : abort(500);
     }
 
-    public function block(Post $post){
+    public function block(Post $post)
+    {
 
         $post->update(["blacklist" => 1]);
-         return redirect()->route('posts.index');
+        return redirect()->route('posts.index');
     }
 
 

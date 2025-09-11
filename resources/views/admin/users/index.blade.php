@@ -26,6 +26,8 @@
                                     <th scope="col">البريد الإلكتروني</th>
                                     <th scope="col">مدينة السكن</th>
                                     <th scope="col">الجوال</th>
+                                    <th scope="col">تاريخ الميلاد</th>
+                                    <th scope="col">الميزانية القصوى</th>
                                     <th scope="col">حالة التفعيل</th>
                                     <th scope="col">العمليات</th>
                                     <th scope="col">العمليات</th>
@@ -54,7 +56,9 @@
                     {data: 'name', name: 'name'},
                     {data: 'email', name: 'email'},
                     {data: 'city', name: 'city'},
-                    {data: 'mobile', name: 'mobile'},
+                    {data: 'phone', name: 'phone'},
+                    {data: 'birth_date', name: 'birth_date'},
+                    {data: 'max_budget', name: 'max_budget'},
                     {data: 'email_verified_at', name: 'email_verified_at'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                     {data: 'actionone', name: 'actionone', orderable: false, searchable: false},

@@ -210,6 +210,8 @@ Route::post('admin/login', [AdminLoginController::class, 'login'])->name('admin.
 Route::post('admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
 Route::group(['middleware' => 'auth:admin', 'prefix' => 'admin'], function () {
+    // Featured Posts
+    Route::get('posts/type_enum/featured', [AdminPostController::class, 'featured'])->name('featured_posts');
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -241,6 +243,10 @@ Route::group(['middleware' => 'auth:admin', 'prefix' => 'admin'], function () {
     Route::resource('posts', AdminPostController::class);
     Route::get('posts/{post}/delete', [AdminPostController::class, 'destroy'])->name('posts.delete');
     Route::get('posts/{post}/block', [AdminPostController::class, 'block'])->name('posts.block');
+
+    // Modal routes for posts
+    Route::get('posts/{post}/modal-show', [AdminPostController::class, 'modalShow'])->name('posts.modal.show');
+    Route::get('posts/{post}/modal-edit', [AdminPostController::class, 'modalEdit'])->name('posts.modal.edit');
 
     // Delete Post Attachment
     Route::get('delete_attachment/{id}', [AttachmentController::class, 'delete'])->name('attachments.delete');

@@ -37,6 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'birth_date' => 'date',
+        'phone_verified_at' => 'datetime',
     ];
 
     public function getRouteKeyName()
