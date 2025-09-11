@@ -7,7 +7,15 @@
                     <div class="border border-radius-medium p-lg-5 p-sm-3 p-2">
                         <h3 class="h3 text-dark-heading mb-3"> إضــــافــــة عـــــرض جـــــديـــــد</h3>
 
-
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                         <div class="border-top pt-4">
                             <form method="POST" action="{{ route('the_posts.store') }}" novalidate id="post_add_form"
                                 enctype="multipart/form-data">

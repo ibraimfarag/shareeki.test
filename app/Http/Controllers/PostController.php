@@ -164,19 +164,61 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostFormRequest $request)
+    public function store(Request $request)
     {
+        // الفاليديشن داخل الدالة مباشرة
 
-        /*----- in case of user not authenticated -----*/
-        if ($request->not_logged_in) {
-            if ($request->has('main_image'))
-                session()->put('image', Upload::uploadImage($request->main_image, 'temp', $request->title));
-            session()->put('post', $request->except('main_image'));
-            return redirect()->route('login');
-        }
-        /*----- in case of user not authenticated -----*/
 
+        $request->validate([
+            'main_image' => 'mimes:jpeg,jpg,png,gif|sometimes|max:10000',
+            'area_id' => 'sometimes|numeric',
+            'category_id' => 'required|numeric',
+            'title' => 'required',
+            'sort' => 'required',
+            'partner_sort' => 'in:0,1',
+            'the_tags' => 'sometimes',
+            'partnership_percentage' => 'sometimes',
+            'weeks_hours' => 'sometimes',
+            'price' => 'required|numeric',
+            'partners_no' => 'required_if:full_partnership,on|min:0|max:100|numeric',
+            'body' => 'required',
+            'the_attachment.*' => 'required|file|mimes:xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff'
+        ], [
+            'category_id.required' => 'يجب اختيار فئة للإعلان',
+            'category_id.numeric' => 'فئة الإعلان غير صحيحة',
+            'title.required' => 'يجب كتابة عنوان الإعلان',
+            'sort.required' => 'يجب اختيار نوع الفرصة (فكرة ، عمل قائم )',
+            'price.required' => 'يجب تحديد المبلغ المطلوب',
+            'price.numeric' => 'المبلغ يجب أن يكون رقماً صحيحاً',
+            'partners_no.required_if' => 'يجب تحديد عدد الشركاء عند اختيار الشراكة',
+            'partners_no.min' => 'عدد الشركاء يجب أن يكون على الأقل شريك واحد',
+            'partners_no.max' => 'عدد الشركاء لا يمكن أن يزيد عن 100 شريك',
+            'partners_no.numeric' => 'عدد الشركاء يجب أن يكون رقماً صحيحاً',
+            'body.required' => 'يجب كتابة وصف تفصيلي عن الفرصة',
+            'main_image.mimes' => 'الصورة يجب أن تكون من نوع: JPEG, JPG, PNG, أو GIF',
+            'main_image.max' => 'حجم الصورة يجب أن يكون أقل من 10 ميجابايت',
+            'area_id.numeric' => 'المنطقة المختارة غير صحيحة',
+            'area_id.sometimes' => 'يجب اختيار منطقة صحيحة',
+            'the_attachment.*.required' => 'يجب اختيار ملف للمرفق',
+            'the_attachment.*.file' => 'المرفق يجب أن يكون ملفاً صحيحاً',
+            'the_attachment.*.mimes' => 'المرفق يجب أن يكون من الأنواع المسموحة: Excel, Word, PDF, أو صورة',
+            'partner_sort.in' => 'اختيار نوع الشريك غير صحيح',
+            'partnership_percentage.numeric' => 'نسبة الشراكة يجب أن تكون رقماً',
+            'the_tags.sometimes' => 'الكلمات المفتاحية يجب أن تكون نصاً صحيحاً',
+            'weeks_hours.sometimes' => 'ساعات العمل يجب أن تكون رقماً صحيحاً',
+        ]);
+        /*----- in case of user not authenticated -----*/
+        // if ($request->not_logged_in) {
+        //     if ($request->has('main_image'))
+        //         session()->put('image', Upload::uploadImage($request->main_image, 'temp', $request->title));
+        //     session()->put('post', $request->except('main_image'));
+        //     return redirect()->route('login');
+        // }
+        /*----- in case of user not authenticated -----*/
+        //   
         // منع المستخدم غير المفعّل للجوال من إضافة إعلان
+
+
         $user = auth()->user();
         if (!$user->phone_verified_at) {
             return redirect()->route('get_personal_info')->with('error', 'يجب تفعيل رقم الجوال أولاً قبل إضافة إعلان جديد.');
@@ -225,8 +267,13 @@ class PostController extends Controller
 
         // Add The Post Tags
         foreach ($request->tags as $tag) {
-            DB::table('taggables')->insert(['tag_id' => $tag, 'taggable_type' => 'App\Post', 'taggable_id' => $the_post->id]);
-
+            if (!empty($tag) && is_numeric($tag)) {
+                DB::table('taggables')->insert([
+                    'tag_id' => $tag,
+                    'taggable_type' => 'App\Post',
+                    'taggable_id' => $the_post->id
+                ]);
+            }
         }
 
         // Add The Attachments
