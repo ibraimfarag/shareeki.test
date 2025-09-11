@@ -48,7 +48,7 @@
                 <div class="container">
                     <div class="header-navbar">
                         <div class="header-logo">
-                            <a href="index-1.html"><img class="light-version-logo"
+                            <a href="/"><img class="light-version-logo"
                                     src="{{asset('assets/media/logo.svg')}}" alt="logo"></a>
 
                         </div>
@@ -58,7 +58,7 @@
                                 <div class="d-block d-lg-none">
                                     <div class="mobile-nav-header">
                                         <div class="mobile-nav-logo">
-                                            <a href="index-1.html">
+                                            <a href="/">
                                                 <img class="light-mode" src="{{asset('assets/media/logo-2.svg')}}"
                                                     alt="Site Logo">
                                                 <img class="dark-mode" src="{{asset('assets/media/logo-3.svg')}}"
@@ -140,11 +140,11 @@
                 <div class="row ">
                     <div class="col-lg-5 col-xl-6">
                         <ul class="main-navigation list-unstyled">
-                            <li><a href="index-1.html">Digital Agency</a></li>
-                            <li><a href="index-2.html">Creative Agency</a></li>
-                            <li><a href="index-3.html">Personal Portfolio</a></li>
-                            <li><a href="index-4.html">Home Startup</a></li>
-                            <li><a href="index-5.html">Corporate Agency</a></li>
+                            <li><a href="/">Digital Agency</a></li>
+                            <li><a href="/">Creative Agency</a></li>
+                            <li><a href="/">Personal Portfolio</a></li>
+                            <li><a href="/">Home Startup</a></li>
+                            <li><a href="/">Corporate Agency</a></li>
                         </ul>
                     </div>
                     <div class="col-lg-7 col-xl-6">
