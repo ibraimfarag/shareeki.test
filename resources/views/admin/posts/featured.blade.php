@@ -77,19 +77,19 @@
             });
 
             // معالجة إغلاق المودال
-            $('.close-modal-btn').on('click', function() {
+            $('.close-modal-btn').on('click', function () {
                 $('#postModal').modal('hide');
             });
 
             // إغلاق المودال عند الضغط على الخلفية
-            $('#postModal').on('click', function(e) {
+            $('#postModal').on('click', function (e) {
                 if (e.target === this) {
                     $('#postModal').modal('hide');
                 }
             });
 
             // إغلاق المودال عند الضغط على Escape
-            $(document).on('keydown', function(e) {
+            $(document).on('keydown', function (e) {
                 if (e.key === 'Escape' && $('#postModal').hasClass('show')) {
                     $('#postModal').modal('hide');
                 }

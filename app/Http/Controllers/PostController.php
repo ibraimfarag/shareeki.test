@@ -337,7 +337,13 @@ class PostController extends Controller
         //dd($storage_attachments);
         $the_post->storage_attachments = $storage_attachments;
         $related = DB::table('taggables')->where('taggable_id', $the_post->id)->get();
-        $tags = DB::table('tags')->where('id', $related[0]->tag_id)->get();
+        
+        // التحقق من وجود tags قبل الوصول إليها
+        $tags = [];
+        if ($related->isNotEmpty()) {
+            $tags = DB::table('tags')->where('id', $related[0]->tag_id)->get();
+        }
+        
         $post = $the_post;
 
         return view('main.posts.show', ["post" => $the_post, "tags" => json_decode($tags)]);
@@ -406,7 +412,13 @@ class PostController extends Controller
         $the_post->partner_sort = json_decode($the_post->partner_sort, true);
 
         $related = DB::table('taggables')->where('taggable_id', $the_post->id)->get();
-        $tags = DB::table('tags')->where('id', $related[0]->tag_id)->get();
+        
+        // التحقق من وجود tags قبل الوصول إليها
+        $postTags = [];
+        if ($related->isNotEmpty()) {
+            $postTags = DB::table('tags')->where('id', $related[0]->tag_id)->get();
+        }
+        
         return view('main.posts.edit', [
             'post' => $the_post,
             'countries' => Area::whereParentId(1)->orderBy('position')->get(),
@@ -418,7 +430,7 @@ class PostController extends Controller
             'theCategory' => $category,
             'theSubCategory' => $subCategory,
             'tags' => $theTags,
-            'theTags' => $tags[0]
+            'theTags' => $postTags->isNotEmpty() ? $postTags[0] : null
         ]);
     }
 

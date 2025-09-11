@@ -30,13 +30,16 @@ class UserController extends Controller
                 })
                 ->addcolumn('email_verified_at', function ($row) {
                     $btn = $row->email_verified_at == null ? 'غير مفعل' : 'مفعل';
-                    return $btn; })
+                    return $btn;
+                })
                 ->addcolumn('action', function ($row) {
                     $btn = '<a href="' . route("users.edit", $row->name) . '" class="btn btn-warning">تعديل</a>';
-                    return $btn; })
+                    return $btn;
+                })
                 ->addcolumn('actionone', function ($row) {
                     $btn = '<a href="' . route("users.delete", [$row->name]) . '" class="delete btn btn-danger btn-sm">حذف</a>';
-                    return $btn; })
+                    return $btn;
+                })
                 ->rawColumns(['action', 'actionone'])
                 ->addIndexColumn()
                 ->make(true);

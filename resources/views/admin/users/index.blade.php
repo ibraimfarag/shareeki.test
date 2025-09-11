@@ -1,23 +1,24 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    مستخدمين الموقع
-                    <a href="{{ route('users.create') }}" class="btn btn-primary" style="float:left">إضافة مستخدم جديد</a>
-                </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        مستخدمين الموقع
+                        <a href="{{ route('users.create') }}" class="btn btn-primary" style="float:left">إضافة مستخدم
+                            جديد</a>
+                    </div>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+                    <div class="card-body">
+                        @if (session('status'))
+                            <div class="alert alert-success" role="alert">
+                                {{ session('status') }}
+                            </div>
+                        @endif
 
-                    <table class="table table-bordered data-table">
+                        <table class="table table-bordered data-table">
 
                             <thead>
                                 <tr>
@@ -33,15 +34,15 @@
                                     <th scope="col">العمليات</th>
                                 </tr>
                             </thead>
-                            
+
                         </table>
-                       
-                    </ul>
+
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('footer')
@@ -52,20 +53,20 @@
                 serverSide: true,
                 ajax: "{{ route('users.index') }}",
                 columns: [
-                    {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                    {data: 'name', name: 'name'},
-                    {data: 'email', name: 'email'},
-                    {data: 'city', name: 'city'},
-                    {data: 'phone', name: 'phone'},
-                    {data: 'birth_date', name: 'birth_date'},
-                    {data: 'max_budget', name: 'max_budget'},
-                    {data: 'email_verified_at', name: 'email_verified_at'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
-                    {data: 'actionone', name: 'actionone', orderable: false, searchable: false},
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'city', name: 'city' },
+                    { data: 'phone', name: 'phone' },
+                    { data: 'birth_date', name: 'birth_date' },
+                    { data: 'max_budget', name: 'max_budget' },
+                    { data: 'email_verified_at', name: 'email_verified_at' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                    { data: 'actionone', name: 'actionone', orderable: false, searchable: false },
                 ],
                 dom: 'lBfrtip',
             });
-            
+
         });
         $.fn.dataTable.ext.errMode = 'none';
     </script>
