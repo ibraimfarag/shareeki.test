@@ -196,6 +196,10 @@
                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                               name="email" value="{{ old('email') }}" required autocomplete="email">
                            <label for="floatingInput">البريد الالكتروني</label>
+                           <small class="form-text text-muted d-block mt-1"
+                              style="font-size: 0.75rem;font-family: &quot;Tajawal&quot;, sans-serif;">
+                              البريد الإلكتروني لابد ان يكون صالح، لعملية الدخول واسترداد الرمز السري 😎☝🏼
+                           </small>
                            @error('email')
                               <span class="invalid-feedback" role="alert">
                                  <strong>{{ $message }}</strong>
