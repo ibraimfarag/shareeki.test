@@ -124,40 +124,7 @@
                     <div class="col-lg-12">
                         <div class="mt-3 pb-4">
                             <div class="row">
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        الدولة
-                                    </h4>
-                                    <div>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected disabled>الدولة</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        المدينة
-                                    </h4>
-                                    <div>
-                                        <select class="form-select" aria-label="Default select example">
-                                            <option selected disabled>المدينة</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        عدد ساعات التفرغ بالأسبوع
-                                    </h4>
-                                    <div>
-                                        <input class="form-control" type="number" placeholder="أقصى عدد ساعات عمل بالأسبوع">
-                                    </div>
-                                </div>
+                                <!-- تم إلغاء فلتر الدولة وعدد ساعات التفرغ -->
                                 <div class="col-lg-8 mb-3">
                                     <h4 class="h4 text-dark-heading">
                                         المبلغ المطلوب
@@ -230,20 +197,7 @@
                     <div class="collapse" id="collapseExample">
                         <div class="border-bottom mt-3 pb-4">
                             <div class="row">
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        الدولة
-                                    </h4>
-                                    <div>
-                                        <select id="the_country" onchange="getSubCities(this);" class="form-select"
-                                            aria-label="Default select example">
-                                            <option selected disabled>الدولة</option>
-                                            @foreach ($countries as $country)
-                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
+                                <!-- فلتر المدينة -->
                                 <div class="col-lg-4 mb-3">
                                     <h4 class="h4 text-dark-heading">
                                         المدينة
@@ -252,18 +206,12 @@
                                         <select class="form-select" name="area_id" id="area_id"
                                             aria-label="Default select example">
                                             <option selected disabled>المدينة</option>
+                                            @if(isset($areas) && count($areas))
+                                                @foreach ($areas as $area)
+                                                    <option value="{{ $area->id }}">{{ $area->name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        عدد ساعات التفرغ بالأسبوع
-                                    </h4>
-                                    <div>
-                                        <input class="form-control" type="number" placeholder="أقصى عدد ساعات عمل بالأسبوع"
-                                            id="weeks_hours" class="form-control @error('weeks_hours') is-invalid @enderror"
-                                            name="weeks_hours" value="{{ old('weeks_hours') }}" required
-                                            autocomplete="weeks_hours">
                                     </div>
                                 </div>
                                 <div class="col-lg-8 mb-3">
@@ -528,24 +476,24 @@
             </nav>
         </div>
         <style>
-@media (max-width: 576px) {
-    .deletePagination {
-        max-width: 100%;
-        width: 100%;
-        padding-left: 0;
-        padding-right: 0;
-        overflow-x: auto;
-    }
+            @media (max-width: 576px) {
+                .deletePagination {
+                    max-width: 100%;
+                    width: 100%;
+                    padding-left: 0;
+                    padding-right: 0;
+                    overflow-x: auto;
+                }
 
-    .pagination {
-        font-size: 0.85rem;
-        flex-wrap: nowrap;
-        width: 100%;
-        min-width: 340px;
-        overflow-x: auto;
-        display: flex;
-    }
-}
+                .pagination {
+                    font-size: 0.85rem;
+                    flex-wrap: nowrap;
+                    width: 100%;
+                    min-width: 340px;
+                    overflow-x: auto;
+                    display: flex;
+                }
+            }
         </style>
     </div>
     <!--  -->
@@ -635,7 +583,7 @@
             };
 
             @auth
-                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -646,12 +594,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                                <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                                  <p class="h4">
-                                                  لا توجد اي معلومات مطابقة
-                                                  </p>
-                                               </div>
-                                                </div>`);
+                                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                                          <p class="h4">
+                                                          لا توجد اي معلومات مطابقة
+                                                          </p>
+                                                       </div>
+                                                        </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
