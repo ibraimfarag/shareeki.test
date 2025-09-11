@@ -362,17 +362,17 @@
                 @foreach ($paidPosts as $paidPost)
                     <div class="mt-2 margin-right-ads">
                         <a href="{{ route('the_posts.show', $paidPost->id) }}">
-                            <div class="card box-shadow-medium border-radius-medium card-hover ad-h">
+                            <div class="card box-shadow-medium border-radius-medium card-hover ad-h px-0 py-0">
                                 <img class="img-ad"
                                     src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
                                     class="card-img-top" alt="...">
-                                <div class="card-body" style="padding-right: 0px;">
+                                <div class="card-body" style="padding-right: 5px;">
                                     <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
                                         {{ $paidPost->category->name ?? 'غير محدد' }}
                                     </h4>
                                     <h3 class="h4 card-text text-dark-content mb-3 line-clamp2">{{ $paidPost->title }}</h3>
                                 </div>
-                                <div class="card-footer bg-transparent" style="padding-right: 0px;">
+                                <div class="card-footer bg-transparent" style="padding-right: 5px;">
                                     <h5 class="h4 text-blue-light-heading mb-0">المبلغ المطلوب
                                         {{ number_format($paidPost->price) }}
                                         ريال

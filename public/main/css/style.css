@@ -2017,9 +2017,10 @@ img {
 }
 
 .img-ad {
-  width: 40vh;
-  object-fit: cover;
-  height: 15vh;
+    width: 40vh;
+    object-fit: cover;
+    height: 18vh;
+    border-radius: 12px 12px 0 0;
 
 }
 
