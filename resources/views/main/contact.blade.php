@@ -42,6 +42,7 @@
                                         <label for="floatingInput">اسم المستخدم </label>
                                         <span class="name-contact-error invalid-feedback" role="alert"></span>
                                     </div>
+
                                     <div class="form-floating mb-3">
                                         <input type="email" class="form-control email" name="email">
                                         <span class="email-contact-error invalid-feedback" role="alert"></span>
@@ -68,22 +69,25 @@
 
 
 
-                                     <div class="mt-3">
-                                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site') }}"
-                                            data-callback="correctCaptcha"></div>
-                                        @if($errors->has('captcha'))
-                                            <div class="text-danger mt-2">{{ $errors->first('captcha') }}</div>
-                                        @endif
-                                        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
+
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control @error('puzzle') is-invalid @enderror"
+                                            name="puzzle_answer" value="{{ old('puzzle_answer') }}"
+                                            placeholder="أدخل الناتج">
+                                        <label>أدخل ناتج العملية: {{ isset($a) ? $a : '?' }}
+                                            {{ isset($op) ? $op : '+' }}
+                                            {{ isset($b) ? $b : '?' }}</label>
+                                        @error('puzzle')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
-                                    
 
                                     <button type="submit" class="btn main-btn blue-btn p-3 rounded w-100 mb-2 db_send">
                                         ارسال
                                     </button>
 
-                                   
+
                                 </div>
 
                             </div>
