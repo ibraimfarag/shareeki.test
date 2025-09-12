@@ -11,17 +11,30 @@
             margin: 50px 0 50px 0;
         }
 
+        /* Ensure clamping works and text doesn't overlap */
         .line-clamp2 {
-            overflow: inherit !important;
-            white-space: inherit;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
+        /* Card layout fixes to avoid text spilling and overlapping */
         .card.box-shadow-medium.border-radius-medium.card-hover {
-            padding: 1rem 0.5rem;
-            line-height: 1.6;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            /* allow flex children to shrink properly */
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+            padding: 0;
+            /* body will handle padding */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
             border-radius: 12px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            align-items: stretch;
         }
 
 
@@ -47,17 +60,97 @@
         }
 
         .card.box-shadow-medium.border-radius-medium.card-hover .card-body {
-            font-size: 1rem;
-            color: #333;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: #222;
+            flex: 1 1 auto;
+            /* allow body to grow and push footer to bottom */
+            min-height: 0;
+            /* important for flex children to be able to shrink on small screens */
         }
 
         .card.box-shadow-medium.border-radius-medium.card-hover .card-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.25;
+            font-size: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
         }
 
         .card.box-shadow-medium.border-radius-medium.card-hover .card-text {
-            margin-bottom: 1rem;
+            margin: 0;
+            font-size: 0.95rem;
+            color: #444;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+        }
+
+        /* image area keeps aspect ratio and won't stretch card content */
+        .card.box-shadow-medium.border-radius-medium.card-hover .card-img-top {
+            width: 100%;
+            height: 160px;
+            /* adjust as needed */
+            object-fit: cover;
+            display: block;
+            flex-shrink: 0;
+            /* prevent image from collapsing when available space is small */
+        }
+
+        /* price/footer should stick to the bottom and not overlap */
+        .card.box-shadow-medium.border-radius-medium.card-hover .card-footer {
+            background: transparent;
+            border-top: 0;
+            padding: 8px 12px;
+            flex-shrink: 0;
+        }
+
+        .card.box-shadow-medium.border-radius-medium.card-hover .price-footer {
+            margin-top: auto;
+            padding-top: 6px;
+        }
+
+        /* Ensure bootstrap grid columns that contain cards stretch the card so footer is visible */
+        .ads-new-cards .col-lg-3,
+        .ads-new-cards .col-lg-3>div {
+            display: flex;
+        }
+
+        .ads-new-cards .col-lg-3 .card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Swiper specific: make slides show full card and avoid vertical cropping of footer */
+        .premium-swiper .swiper-slide {
+            display: flex;
+            /* align to top so card footer is not pushed outside the visible area */
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .premium-swiper .card {
+            /* allow card to size naturally so footer is visible */
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* If markup sets a large inline min-height on the container, ensure slides can expand vertically */
+        .premium-swiper {
+            min-height: 0 !important;
         }
     </style>
 @endsection
@@ -113,81 +206,7 @@
     </section>
     <!--   -->
 
-    <!-- advanced search in mobile -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
-        <div class="offcanvas-header">
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="mt-3 pb-4">
-                            <div class="row">
-                                <!-- تم إلغاء فلتر الدولة وعدد ساعات التفرغ -->
-                                <div class="col-lg-8 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        المبلغ المطلوب
-                                    </h4>
-                                    <div>
-                                        <input class="form-control" type="number" placeholder=" المبلغ المطلوب لا يتعدى">
-                                    </div>
-                                </div>
 
-                                <div class="col-lg-4 mb-3">
-                                    <h4 class="h4 text-dark-heading">
-                                        نوع الفرصة
-                                    </h4>
-                                    <div class="d-flex" id="checkboxs-wrap">
-                                        <div class="card border border-radius-rounded bg-gray-light card-transition me-3">
-                                            <div class="card-body p-0">
-                                                <input type="checkbox" class="btn-check" name="options" id="option3"
-                                                    autocomplete="off">
-                                                <label
-                                                    class="btn btn-checked-rounded h4 card-text text-dark-content mb-0  px-3 py-2"
-                                                    for="option3">
-                                                    عمل قائم
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
-                                <!-- @foreach ($categories as $category)-->
-                                <!-- <h1>Where is it</h1>-->
-                                <!--<div class="col-auto mt-3 h-100">-->
-                                <!--    <div class="card border bg-gray-light card-transition">-->
-                                <!--        <div class="card-body p-0">-->
-                                <!--        <input type="checkbox" class="btn-check" value="{{$category->id}}" name="skillsoption" id="skillsoption{{$category->id}}"-->
-                                <!--            autocomplete="off">-->
-                                <!--        <label class="btn btn-checked h4 card-text text-dark-content mb-0  px-3 py-2"-->
-                                <!--            for="skillsoption{{$category->id}}">-->
-                                <!--            <div class="d-flex align-items-center">-->
-                                <!--                <div class="sx-icon">-->
-                                <!--                    <img src="{{ asset('main/images/'.$category->image) }}" alt="">-->
-                                <!--                </div>-->
-                                <!--                <h4 class="h4 card-text text-dark-content mb-0 ms-3">{{$category->name}}</h4>-->
-                                <!--            </div>-->
-                                <!--        </label>-->
-                                <!--        </div>-->
-                                <!--    </div>-->
-                                <!--</div>-->
-                                <!--@endforeach-->
-
-                                <div class="col-lg-2 col-sm-12 mt-3">
-                                    <button class="btn main-btn gold-btn medium-btn rounded-btn me-2 w-100">
-                                        بحث
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Categories section -->
     <section class="categories-block mb-5">
@@ -264,7 +283,7 @@
                                     </button>
                                 </div>
 
-                                <div class="col-lg-2 col-5 mt-3">
+                                <div class="col-lg-2 col-6 mt-3">
                                     <a href="{{asset('/')}}"
                                         class="btn main-btn gold-btn medium-btn rounded-btn me-2 w-100">
                                         إعادة تعيين
@@ -298,9 +317,8 @@
         </div>
     </section>
 
-    <!-- Paid Opportunities section -->
 
-    {{-- @if ($paidPosts->count() > 0) --}}
+    <!-- Paid Opportunities section -->
     <!-- Section for large screens -->
     <section class="opportunities-block wrap fut-sec d-none d-lg-block" id="services">
         <div class="container">
@@ -311,17 +329,17 @@
                     <div class="mt-2 margin-right-ads">
                         <a href="{{ route('the_posts.show', $paidPost->id) }}">
                             <div class="card box-shadow-medium border-radius-medium card-hover ad-h px-0 py-0">
-                                <img class="img-ad"
+                                <img class="card-img-top"
                                     src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
-                                    class="card-img-top" alt="...">
+                                    alt="...">
                                 <div class="card-body" style="padding-right: 5px;">
                                     <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
                                         {{ $paidPost->category->name ?? 'غير محدد' }}
                                     </h4>
                                     <h3 class="h4 card-text text-dark-content mb-3 line-clamp2">{{ $paidPost->title }}</h3>
                                 </div>
-                                <div class="card-footer bg-transparent" style="padding-right: 5px;">
-                                    <h5 class="h4 text-blue-light-heading mb-0">المبلغ المطلوب
+                                <div class="card-footer bg-transparent price-footer pb-4" style="padding-right: 5px;">
+                                    <h5 class="h4 text-blue-light-heading mb-3">المبلغ المطلوب
                                         {{ number_format($paidPost->price) }}
                                         ريال
                                     </h5>
@@ -334,7 +352,8 @@
                 @for ($i = $paidPosts->count(); $i < 4; $i++)
                     <div class="mt-2">
                         <a href="{{ route('the_posts.create') }}">
-                            <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space ad-h">
+                            <div class="card box-shadow-medium border-radius-medium card-hover empty-card free-space ad-h"
+                                style="height: 40vh;">
                                 <div class="card-body text-center">
                                     <h4 class="h4 card-title text-dark-heading mb-2">اغتنم الفرصة الآن!</h4>
                                     <p class="card-text text-dark-content mb-0">لاتفوت الاشتراك بباقة VIP وزيادة فرص العثور على
@@ -356,7 +375,13 @@
         <div class="container" style="padding: 0.2rem 0;">
             <h2 class="h2 text-dark-heading text-center mb-1" style="font-size: 1rem; font-weight: bold; color: #007bff;">
                 الفرص المميزة</h2>
-            <div class="swiper premium-swiper" style="overflow: hidden; min-height: 270px; direction: rtl;">
+            <div class="swiper premium-swiper"
+                style="overflow: hidden; min-height: 270px; direction: rtl; position:relative;">
+                <!-- Autoplay toggle (persisted) -->
+                <button id="premium-autoplay-toggle" type="button" class="btn btn-sm btn-outline-primary"
+                    style="position:absolute; top:8px; left:12px; z-index:60;">
+                    تعطيل التشغيل
+                </button>
                 <div class="swiper-wrapper">
                     <!-- card -->
                     @foreach ($paidPosts as $paidPost)
@@ -366,14 +391,14 @@
                                 <a href="{{ route('the_posts.show', $paidPost->id) }}">
                                     <img class="img-ad"
                                         src="{{ !empty($paidPost->img) ? $paidPost->img_path : ($paidPost->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
-                                        class="card-img-top" alt="...">
+                                        alt="...">
                                     <div class="card-body">
                                         <h4 class="h4 card-title text-dark-heading mb-1 line-clamp2">
                                             {{ $paidPost->category->name ?? 'غير محدد' }}
                                         </h4>
                                         <h3 class="h4 card-text text-dark-content mb-1 line-clamp2">{{ $paidPost->title }}</h3>
                                     </div>
-                                    <div class="card-footer bg-transparent">
+                                    <div class="card-footer bg-transparent price-footer">
                                         <h5 class="h4 text-blue-light-heading mb-0">المبلغ المطلوب
                                             {{ number_format($paidPost->price) }}
                                             ريال
@@ -409,7 +434,6 @@
             </div>
         </div>
     </section>
-    {{-- @endif --}}
 
 
 
@@ -435,10 +459,7 @@
                                         {{ $post->title }}
                                     </h3>
                                 </div>
-                                <div class="card-footer bg-transparent">
-
-                                </div>
-                                <div class="card-footer bg-transparent" style="padding-right: 0px;">
+                                <div class="card-footer bg-transparent price-footer" style="padding-right: 0px;">
                                     <h5 class="h4 text-blue-light-heading mb-0 text-wrap">المبلغ المطلوب
                                         {{ number_format($post->price) }} ريال
                                     </h5>
@@ -583,7 +604,7 @@
             };
 
             @auth
-                                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -594,12 +615,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                                          <p class="h4">
-                                                          لا توجد اي معلومات مطابقة
-                                                          </p>
-                                                       </div>
-                                                        </div>`);
+                                                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                                                          <p class="h4">
+                                                                          لا توجد اي معلومات مطابقة
+                                                                          </p>
+                                                                       </div>
+                                                                        </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
@@ -660,15 +681,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // إعدادات Swiper للفرص المميزة في الموبايل
-            new Swiper('.premium-swiper', {
+            // Read autoplay preference (default true)
+            const autoplayKey = 'premiumSwiperAutoplay';
+            let autoplayEnabled = localStorage.getItem(autoplayKey);
+            autoplayEnabled = autoplayEnabled === null ? true : (autoplayEnabled === '1');
+
+            const premiumSwiper = new Swiper('.premium-swiper', {
                 slidesPerView: 1.2,
                 spaceBetween: 15,
                 centeredSlides: true,
                 loop: true,
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false,
-                },
+                autoplay: autoplayEnabled ? { delay: 4000, disableOnInteraction: false } : false,
                 pagination: {
                     el: '.swiper-pagination',
                     clickable: true,
@@ -707,6 +730,24 @@
                 on: {
                     init: function () {
                         console.log('Swiper للفرص المميزة تم تحميله بنجاح');
+
+                        // setup autoplay toggle button label
+                        const btn = document.getElementById('premium-autoplay-toggle');
+                        if (btn) {
+                            btn.textContent = autoplayEnabled ? 'إيقاف التشغيل' : 'تشغيل';
+                            btn.addEventListener('click', function () {
+                                autoplayEnabled = !autoplayEnabled;
+                                localStorage.setItem(autoplayKey, autoplayEnabled ? '1' : '0');
+                                if (autoplayEnabled) {
+                                    premiumSwiper.params.autoplay = { delay: 4000, disableOnInteraction: false };
+                                    premiumSwiper.autoplay.start();
+                                    btn.textContent = 'إيقاف التشغيل';
+                                } else {
+                                    premiumSwiper.autoplay.stop();
+                                    btn.textContent = 'تشغيل';
+                                }
+                            });
+                        }
                     },
                 },
             });

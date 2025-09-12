@@ -16,16 +16,11 @@
                 </a>
          </div>
   @endforeach
-  @if(count($posts) > 0)
-  <div class="container mt-4">
+  @if($posts->hasPages())
+  <div class="w-100 mt-4">
         <div class="d-flex justify-content-center">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-
-                {{ $posts->render() }}
-
-            </ul>
-        </nav>
+            {{-- Use bootstrap-4 pagination template to keep consistent markup (links() already outputs the <ul>) --}}
+            {{ $posts->links('pagination::bootstrap-4') }}
         </div>
   </div>
   @endif
