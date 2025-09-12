@@ -81,7 +81,7 @@
                         
                         <div class="d-block form-group m-auto mb-4 mt-4 position-relative w-75">
                            <div class="g-recaptcha" data-callback="correctCaptcha"
-                              data-sitekey="6LfeR8YrAAAAAOlK668S4g_W0vyAwbDv2jipifqu"></div>
+                              data-sitekey="{{ config('services.recaptcha.site') }}"></div>
 
                         </div>
 

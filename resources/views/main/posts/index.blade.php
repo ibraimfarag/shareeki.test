@@ -377,11 +377,7 @@
                 الفرص المميزة</h2>
             <div class="swiper premium-swiper"
                 style="overflow: hidden; min-height: 270px; direction: rtl; position:relative;">
-                <!-- Autoplay toggle (persisted) -->
-                <button id="premium-autoplay-toggle" type="button" class="btn btn-sm btn-outline-primary"
-                    style="position:absolute; top:8px; left:12px; z-index:60;">
-                    تعطيل التشغيل
-                </button>
+                <!-- autoplay is automatic on mobile (no toggle) -->
                 <div class="swiper-wrapper">
                     <!-- card -->
                     @foreach ($paidPosts as $paidPost)
@@ -604,7 +600,7 @@
             };
 
             @auth
-                                                                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                                                                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -615,12 +611,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                                                          <p class="h4">
-                                                                          لا توجد اي معلومات مطابقة
-                                                                          </p>
-                                                                       </div>
-                                                                        </div>`);
+                                                                            <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                                                              <p class="h4">
+                                                                              لا توجد اي معلومات مطابقة
+                                                                              </p>
+                                                                           </div>
+                                                                            </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
@@ -681,17 +677,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // إعدادات Swiper للفرص المميزة في الموبايل
-            // Read autoplay preference (default true)
-            const autoplayKey = 'premiumSwiperAutoplay';
-            let autoplayEnabled = localStorage.getItem(autoplayKey);
-            autoplayEnabled = autoplayEnabled === null ? true : (autoplayEnabled === '1');
-
+            // Autoplay: always enabled by default on mobile
             const premiumSwiper = new Swiper('.premium-swiper', {
                 slidesPerView: 1.2,
                 spaceBetween: 15,
                 centeredSlides: true,
                 loop: true,
-                autoplay: autoplayEnabled ? { delay: 4000, disableOnInteraction: false } : false,
+                autoplay: { delay: 4000, disableOnInteraction: false },
                 pagination: {
                     el: '.swiper-pagination',
                     clickable: true,
@@ -730,25 +722,7 @@
                 on: {
                     init: function () {
                         console.log('Swiper للفرص المميزة تم تحميله بنجاح');
-
-                        // setup autoplay toggle button label
-                        const btn = document.getElementById('premium-autoplay-toggle');
-                        if (btn) {
-                            btn.textContent = autoplayEnabled ? 'إيقاف التشغيل' : 'تشغيل';
-                            btn.addEventListener('click', function () {
-                                autoplayEnabled = !autoplayEnabled;
-                                localStorage.setItem(autoplayKey, autoplayEnabled ? '1' : '0');
-                                if (autoplayEnabled) {
-                                    premiumSwiper.params.autoplay = { delay: 4000, disableOnInteraction: false };
-                                    premiumSwiper.autoplay.start();
-                                    btn.textContent = 'إيقاف التشغيل';
-                                } else {
-                                    premiumSwiper.autoplay.stop();
-                                    btn.textContent = 'تشغيل';
-                                }
-                            });
-                        }
-                    },
+                    }
                 },
             });
         });
