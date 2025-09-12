@@ -164,6 +164,13 @@
         .premium-swiper {
             min-height: 0 !important;
         }
+
+
+        .no-focus:focus {
+            background-color: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
     </style>
 @endsection
 
@@ -205,7 +212,7 @@
                             </div>
                             <!--<div class="col-lg-2 d-lg-block d-md-none  ps-0" style="">-->
                             <div class="col-lg-2 d-lg-block   ps-0" style="z-index: 9999;">
-                                <button class="btn mb-0" type="button" data-bs-toggle="collapse"
+                                <button class="btn mb-0 no-focus" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                                     بحث متقدم
                                 </button>
@@ -385,7 +392,7 @@
     <!-- Section for mobile screens -->
     <section class="opportunities-block wrap fut-sec d-block d-lg-none" id="services-mobile" style="margin-bottom: 0.5rem;">
         <div class="container" style="padding: 0.2rem 0;">
-            <h2 class="h2 text-dark-heading text-center mb-1" style="font-size: 1rem; font-weight: bold; color: #007bff;">
+            <h2 class="h2 text-dark-heading text-center mb-2" style="font-size: 1rem; font-weight: bold; color: #007bff;">
                 الفرص المميزة</h2>
             <div class="swiper premium-swiper"
                 style="overflow: hidden; min-height: 270px; direction: rtl; position:relative;">
@@ -612,7 +619,7 @@
             };
 
             @auth
-                                                                                                                                                    var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
+                                                                                                                                                            var userVerified = {!! date("Y-m-d", strtotime(auth()->user()->email_verified_at)) !!};
                 if (userVerified == 1968) {
                     swalMessageIfUnauthenticatedOne();
                     return;
@@ -623,12 +630,12 @@
                 .then(function (response) {
                     if (response.data.html == "") {
                         $('.ads-new-cards').html(`<div class=\"ads-cards\">
-                                                                                    <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
-                                                                                      <p class="h4">
-                                                                                      لا توجد اي معلومات مطابقة
-                                                                                      </p>
-                                                                                   </div>
-                                                                                    </div>`);
+                                                                                        <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                                                                                          <p class="h4">
+                                                                                          لا توجد اي معلومات مطابقة
+                                                                                          </p>
+                                                                                       </div>
+                                                                                        </div>`);
                     } else {
                         $('.ads-new-cards').html(response.data.html);
                     }
