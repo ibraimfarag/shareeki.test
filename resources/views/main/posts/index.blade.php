@@ -62,7 +62,7 @@
                 display: flex;
                 justify-content: center;
             }
-            
+
 
         }
 
@@ -134,13 +134,14 @@
             padding-top: 6px;
         }
 
-        /* Ensure bootstrap grid columns that contain cards stretch the card so footer is visible */
-        .ads-new-cards .col-lg-3,
-        .ads-new-cards .col-lg-3>div {
-            display: flex;
+        /* Unified card grid spacing & stretching */
+        .ads-new-cards { 
+            row-gap: 1rem; /* vertical gap */
         }
-
-        .ads-new-cards .col-lg-3 .card {
+        .ads-new-cards > [class*="col-"] { 
+            display: flex; /* allow card to stretch */
+        }
+        .ads-new-cards .card { 
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -460,28 +461,20 @@
     <!-- Opportunities section -->
     <section class="opportunities-block wrap position-relative margin-top-30 mb-5" id="services">
         <div class="container">
-            <h2 class="h2 text-dark-heading text-left mb-0">الفرص المتاحة</h2>
-            <div class="row align-items-center ads-new-cards">
+            <h2 class="h2 text-dark-heading text-left mb-4">الفرص المتاحة</h2>
+            <div class="row g-3 ads-new-cards">
                 <!-- card -->
                 @foreach ($posts as $post)
-                    <div class="col-lg-3 mt-2">
-
-                        <a href="{{ route('the_posts.show', $post->id) }}">
-                            <div class="card box-shadow-medium border-radius-medium card-hover">
-                                <img src="{{ !empty($post->img) ? $post->img_path : ($post->category->img_path ?? asset('storage/main/categories/default.jpg')) }}"
-                                    class="card-img-top" alt="...">
-                                <div class="card-body" style="padding-right: 0px;">
-                                    <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">
-                                        {{ $post->category->name ?? 'غير محدد' }}
-                                    </h4>
-                                    <h3 class="h4 card-text text-dark-content mb-3 line-clamp2" style="word-wrap: break-word;">
-                                        {{ $post->title }}
-                                    </h3>
+                    <div class="col-lg-3 mt-2 col-md-6 col-sm-6">
+                        <a href="{{ route('the_posts.show', $post->id) }}" class="w-100 d-flex">
+                            <div class="card box-shadow-medium border-radius-medium card-hover w-100">
+                                <img src="{{ !empty($post->img) ? $post->img_path : ($post->category->img_path ?? asset('storage/main/categories/default.jpg')) }}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h4 class="h4 card-title text-dark-heading mb-3 line-clamp2">{{ $post->category->name ?? 'غير محدد' }}</h4>
+                                    <h3 class="h4 card-text text-dark-content mb-3 line-clamp2" style="word-wrap: break-word;">{{ $post->title }}</h3>
                                 </div>
-                                <div class="card-footer bg-transparent price-footer" style="padding-right: 0px;">
-                                    <h5 class="h4 text-blue-light-heading mb-0 text-wrap">المبلغ المطلوب
-                                        {{ number_format($post->price) }} ريال
-                                    </h5>
+                                <div class="card-footer bg-transparent price-footer">
+                                    <h5 class="h4 text-blue-light-heading mb-0 text-wrap">المبلغ المطلوب {{ number_format($post->price) }} ريال</h5>
                                 </div>
                             </div>
                         </a>
