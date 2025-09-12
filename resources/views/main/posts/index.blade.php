@@ -62,6 +62,7 @@
                 display: flex;
                 justify-content: center;
             }
+            
 
         }
 
@@ -171,6 +172,9 @@
             border-color: transparent !important;
             box-shadow: none !important;
         }
+
+
+       
     </style>
 @endsection
 
