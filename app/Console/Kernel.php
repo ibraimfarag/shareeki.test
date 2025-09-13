@@ -15,9 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // فحص وإلغاء الإعلانات المنتهية
-        $schedule->command('ads:expire')->dailyAt('00:00');
-        $schedule->command('ads:expire')->dailyAt('12:00');
+
 
         // فحص وإلغاء الإعلانات المميزة التي تجاوزت المدة
         $schedule->command('posts:check-featured')->dailyAt('00:00');
