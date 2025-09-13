@@ -16,3 +16,5 @@ composer.lock.bak
 composer.lock
 error_log
 composer.lock
+.htaccess
+*.zip
