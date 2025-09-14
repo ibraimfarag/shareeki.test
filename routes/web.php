@@ -325,3 +325,10 @@ Route::controller(FacebookController::class)->group(function () {
 Route::post('phone/send-code', [PhoneVerificationController::class, 'sendCode'])->name('phone.send.code');
 
 Route::post('/payment-status', [PageController::class, 'paymentWebhook']);
+
+Route::get('/version.json', function () {
+    return response()->json([
+        'version' => config('app.version'),
+        'time' => now()->toIso8601String(),
+    ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+});

@@ -278,6 +278,21 @@
          });
       });
    </script>
+
+
+
+<script>
+  fetch('/version.json?cb=' + Date.now())
+    .then(r => r.json())
+    .then(({ version }) => {
+      const prev = localStorage.getItem('appVersion');
+      if (prev && prev !== version) {
+        location.reload();
+      }
+      localStorage.setItem('appVersion', version);
+    });
+</script>
+
 </body>
 @yield('footer')
 
