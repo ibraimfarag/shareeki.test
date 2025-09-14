@@ -2,95 +2,14 @@
 @section('header')
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
    <link rel='stylesheet' href='https://unpkg.com/emoji.css/dist/emoji.min.css'>
-   <style>
-      body {
-         overflow-y: scroll;
-      }
 
-      .data {
-         z-index: -1;
-         margin: 50px 0;
-      }
+      @php
+      $version = '1.0.0'; // غير الرقم وقت ما تحب
+      $timestamp = file_exists(public_path('main/css/pages/show.css')) ? filemtime(public_path('main/css/pages/show.css')) : time();
+   @endphp
+<link rel="stylesheet" href="{{ asset('main/css/pages/show.css') }}?v={{ $version }}&t={{ $timestamp }}">
 
-      input[type=checkbox] {
-         /* Double-sized Checkboxes */
-         -ms-transform: scale(2);
-         /* IE */
-         -moz-transform: scale(2);
-         /* FF */
-         -webkit-transform: scale(2);
-         /* Safari and Chrome */
-         -o-transform: scale(2);
-         /* Opera */
-         transform: scale(2);
-         padding: 10px;
-      }
 
-      /* أنماط الأزرار */
-      .feature-post-btn {
-         background: linear-gradient(45deg, #ffc107, #ffb300);
-         color: #1a1a1a;
-         border: 1px solid rgba(0, 0, 0, .1);
-         padding: 0.6rem 1.2rem;
-         border-radius: 8px;
-         font-weight: 600;
-         display: inline-flex;
-         align-items: center;
-         gap: 0.5rem;
-         transition: all 0.2s ease;
-         text-decoration: none;
-      }
-
-      .feature-post-btn:hover {
-         transform: translateY(-1px);
-         box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
-         color: #000;
-      }
-
-      .feature-post-btn i {
-         font-size: 1.1rem;
-      }
-
-      .feature-post-btn.disabled {
-         background: #e9ecef;
-         color: #6c757d;
-         cursor: not-allowed;
-      }
-
-      /* أنماط شارة الإعلان المميز */
-      .featured-badge {
-         display: inline-flex;
-         align-items: center;
-         gap: 6px;
-         background-color: rgba(255, 193, 7, 0.15);
-         color: #ffc107;
-         padding: 0.4rem 0.8rem;
-         border-radius: 999px;
-         font-size: 14px;
-         font-weight: 600;
-         margin-bottom: 1rem;
-      }
-
-      /* تنسيق Tooltip */
-      .tooltip {
-         font-family: 'Cairo', sans-serif !important;
-         opacity: 1 !important;
-      }
-      
-      .tooltip .tooltip-inner {
-         background-color: #2d3436 !important;
-         color: white !important;
-         padding: 8px 12px !important;
-         font-size: 14px !important;
-         max-width: 300px !important;
-         box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-         border-radius: 6px !important;
-      }
-
-      .tooltip.bs-tooltip-top .tooltip-arrow::before {
-         border-top-color: #2d3436 !important;
-      }
-   </style>
 @endsection
 
 @section('content')

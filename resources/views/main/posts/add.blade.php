@@ -1,4 +1,18 @@
 @extends('main.layouts.app')
+
+
+@section('header')
+
+      @php
+      $version = '1.0.0'; // غير الرقم وقت ما تحب
+      $timestamp = file_exists(public_path('main/css/pages/add.css')) ? filemtime(public_path('main/css/pages/add.css')) : time();
+   @endphp
+<link rel="stylesheet" href="{{ asset('main/css/pages/add.css') }}?v={{ $version }}&t={{ $timestamp }}">
+
+
+@endsection
+
+
 @section('content')
     <div class="form-block my-5">
         <div class="container">
@@ -905,69 +919,5 @@
 
     </script>
 
-    <style>
-        /* تحسين مظهر قطاع الفرصة */
-        .card-transition {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .card-transition:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-transition.border-primary {
-            border-color: #007bff !important;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        /* تحسين مظهر الملصقات */
-        .form-label .fas {
-            color: #6c757d;
-        }
-
-        .text-muted {
-            font-size: 0.85em;
-            font-style: italic;
-        }
-
-        /* تحسين مظهر رسائل الخطأ */
-        .invalid-feedback.d-block {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 0.25rem;
-            color: #721c24;
-        }
-
-        /* تحسين مظهر SweetAlert للحقول الناقصة */
-        .swal2-popup .text-right {
-            text-align: right;
-            direction: rtl;
-        }
-
-        .swal2-popup .list-unstyled li {
-            margin-bottom: 0.5rem;
-            padding: 0.25rem 0;
-        }
-
-        .swal2-popup .text-danger {
-            color: #dc3545 !important;
-        }
-
-        /* تأثير سلس لإخفاء/إظهار قسم الشركاء */
-        #partners_section {
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        #partners_section.hidden {
-            opacity: 0;
-            max-height: 0;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+  
 @endsection

@@ -16,7 +16,11 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
    <link rel="stylesheet" href="{{ asset('main/css/bootstrap-select.min.css') }} ">
    <link rel="stylesheet" href="{{ asset('main/css/bootstrap.rtl.min.css') }} ">
-   <link rel="stylesheet" href="{{ asset('main/css/style.css') }} ">
+   @php
+      $version = '1.0.0'; 
+      $timestamp = file_exists(public_path('main/css/style.css')) ? filemtime(public_path('main/css/style.css')) : time();
+   @endphp
+   <link rel="stylesheet" href="{{ asset('main/css/style.css') }}?v={{ $version }}&t={{ $timestamp }}">
    @yield('header')
 
    <!-- Global site tag (gtag.js) - Google Analytics -->

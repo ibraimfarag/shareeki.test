@@ -66,44 +66,7 @@
         </div>
     </div>
 
-    <style>
-        /* Custom styles to match the exact design */
-        .alert {
-            background-color: #f8d7da !important;
-            border-color: #f5c6cb !important;
-            color: #721c24 !important;
-            border-radius: 8px !important;
-            font-size: 14px !important;
-            line-height: 1.4 !important;
-        }
 
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            transition: all 0.2s;
-        }
-
-        .the_result {
-            font-size: 48px !important;
-            font-weight: bold !important;
-            color: #333 !important;
-            line-height: 1 !important;
-        }
-
-        /* Button hover effects */
-        button[type="submit"]:hover {
-            background: linear-gradient(135deg, #375a7f 0%, #1e3a5f 100%) !important;
-        }
-
-        .btn:last-child:hover {
-            background: #6c757d !important;
-            color: white !important;
-        }
-    </style>
 @endsection
 
 @section('footer')

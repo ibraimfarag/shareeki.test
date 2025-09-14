@@ -1,47 +1,16 @@
 @extends('main.layouts.app')
 
 
+@section('header')
+
+      @php
+      $version = '1.0.0'; // غير الرقم وقت ما تحب
+      $timestamp = file_exists(public_path('main/css/pages/edit.css')) ? filemtime(public_path('main/css/pages/edit.css')) : time();
+   @endphp
+<link rel="stylesheet" href="{{ asset('main/css/pages/edit.css') }}?v={{ $version }}&t={{ $timestamp }}">
 
 
-<style>
-    .container{
-  margin: 20px;
-}
-
-/* autocomplete tagsinput*/
-.label-info {
-  background-color: #5bc0de;
-  display: inline-block;
-  padding: 0.2em 0.6em 0.3em;
-  font-size: 75%;
-  font-weight: 700;
-  line-height: 1;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: 0.25em;
-}
-
-.bootstrap-tagsinput{
-    width: 100%;
-}
-</style>
-
-
-
-<style>
-    body {
-        overflow-y: scroll;
-    }
-
-    .data{
-        z-index: -1;
-        margin: 50px 0 50px 0;
-    }
-
-   
-</style>
+@endsection
 
 
 

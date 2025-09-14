@@ -1,0 +1,30 @@
+     [type=tel] {
+         direction: ltr;
+         text-align: left;
+      }
+
+      .iti--allow-dropdown input,
+      .iti--allow-dropdown input[type=tel] {
+         direction: ltr;
+         text-align: left;
+      }
+
+      /* جعل كود الدولة (العلم والكود) في الشمال (يسار الحقل) */
+      [dir="rtl"] .iti .iti__flag-container {
+         right: auto;
+         left: 0;
+      }
+
+      [dir="rtl"] .iti input {
+         padding-right: 0 !important;
+         padding-left: 82px !important;
+         direction: ltr !important;
+      }
+
+      [dir="rtl"] .iti {
+         direction: ltr;
+      }
+
+            .iti__country-container {
+         left: 0 !important;
+      }
